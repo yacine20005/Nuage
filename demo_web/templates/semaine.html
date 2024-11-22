@@ -1,0 +1,15 @@
+<!doctype html>
+<title>Bientôt le week-end ?</title>
+
+{% if nb_jours > 0 %}
+  Il reste encore {{ nb_jours }} jour(s) avant le week-end :
+
+  <ul>
+    {% for jour in jours %}
+      <li> {{ jour }} </li>
+    {% endfor %}
+  </ul>
+
+{% else %}
+  C'est le week-end !
+{% endif %}
