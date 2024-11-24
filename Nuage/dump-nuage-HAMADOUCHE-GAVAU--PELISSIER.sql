@@ -61,6 +61,7 @@ CREATE TABLE Succes (
     description_Succes TEXT,
     PRIMARY KEY (idSucces),
     FOREIGN KEY (idJeu) REFERENCES Jeu(idJeu)
+    CONSTRAINT unique_succes UNIQUE (idJeu, intitule) --On vérifie qu'un succès n'est pas dupliqué pour un jeu donné--
 ); 
 
 CREATE TABLE Commentaire (
@@ -71,7 +72,8 @@ CREATE TABLE Commentaire (
     idJoueur INT,
     PRIMARY KEY (idCommentaire),
     FOREIGN KEY (idJeu) REFERENCES Jeu(idJeu),
-    FOREIGN KEY (idJoueur) REFERENCES Joueur(idJoueur)
+    FOREIGN KEY (idJoueur) REFERENCES Joueur(idJoueur),
+    CONSTRAINT unique_commentaire UNIQUE (idJeu, idJoueur) --On vérifie qu'un joueur ne peut pas commenter plusieurs fois le même jeu--
 );
 
 CREATE TABLE Transaction_user (
@@ -89,10 +91,10 @@ CREATE TABLE Transaction_user (
 CREATE TABLE Amitie (
     idJoueur1 INT,
     idJoueur2 INT,
-    CONSTRAINT check_doublon_amitie CHECK (idJoueur1 < idJoueur2), --On vérifie que l'idJoueur1 est plus petit que l'idJoueur2 pour éviter les doublons éventuelles--
     PRIMARY KEY (idJoueur1, idJoueur2),
     FOREIGN KEY (idJoueur1) REFERENCES Joueur(idJoueur),
     FOREIGN KEY (idJoueur2) REFERENCES Joueur(idJoueur)
+    CONSTRAINT check_doublon_amitie CHECK (idJoueur1 < idJoueur2), --On vérifie que l'idJoueur1 est plus petit que l'idJoueur2 pour éviter les doublons éventuelles--
 );
 
 CREATE TABLE Partage (
@@ -139,7 +141,7 @@ CREATE TABLE JeuGenre (
 
 ---<Vues>---
 
-CREATE VIEW RapportVentes AS
+/*CREATE VIEW RapportVentes AS
 (
 SELECT 
     e.nomEntreprise AS Entreprise, --On récupère le nom de l'entreprise--
@@ -155,6 +157,31 @@ FROM
     LEFT JOIN Transaction_user AS t ON j.idJeu = t.idJeu
     LEFT JOIN Partage AS p ON j.idJeu = p.idJeu
     LEFT JOIN Commentaire AS c ON j.idJeu = c.idJeu
+GROUP BY 
+    e.nomEntreprise, t.date_transaction
+);*/
+
+CREATE VIEW RapportVentes AS
+(
+SELECT 
+    e.nomEntreprise AS Entreprise, --On récupère le nom de l'entreprise--
+    t.date_transaction AS Date, --On récupère la date pour séparer les stats par date--
+    COUNT(DISTINCT t.idTransaction) AS NombreVentes, --On compte le nombre de ventes différentes--
+    COUNT(DISTINCT p.idJeu) AS NombrePrets, --On compte le nombre de prêts différents--
+    SUM(t.montant) AS ChiffreAffaire, --On somme les montants des transactions pour obtenir le chiffre d'affaire total--
+    NotationMoyenne --On calcule la moyenne des notes des commentaires pour obtenir la notation moyenne--
+    --Manque les succès obtenus dans le jeu--
+FROM 
+    Jeu AS j
+    JOIN Entreprise AS e ON j.idEditeur = e.idEntreprise
+    LEFT JOIN Transaction_user AS t ON j.idJeu = t.idJeu
+    LEFT JOIN Partage AS p ON j.idJeu = p.idJeu
+    LEFT JOIN Commentaire AS c ON j.idJeu = c.idJeu
+    (
+        SELECT AVG(note) AS NotationMoyenne 
+        from Commentaire
+        Group by date_commentaire
+    )
 GROUP BY 
     e.nomEntreprise, t.date_transaction
 );

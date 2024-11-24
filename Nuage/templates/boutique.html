@@ -1,150 +1,56 @@
 <!DOCTYPE html>
 <html lang="fr">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Nuage</title>
-        <style>
-            :root {
-                --primary-color: #1c1c1c;
-                --background-color: #121212;
-                --text-color: #ffffff;
-                --secondary-color: #1c1c1c;
-                --accent-color: #950101;
-            }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='nuage.css') }}"
+    />
+    <title>Nuage</title>
+  </head>
+  <body>
+    <header>
+      <div class="logo">Nuage</div>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('boutique') }}">Boutique</a></li>
+          <li><a href="{{ url_for('recherche') }}">Recherche</a></li>
+          <li><a href="#">Profil</a></li>
+          <li><a href="#">Connexion</a></li>
+        </ul>
+      </nav>
+    </header>
 
-            body {
-                font-family: 'Century Gothic';
-                margin: 0;
-                padding: 0;
-                background-color: var(--background-color);
-                color: var(--text-color);
-            }
+    <main>
+      <h1>Jeux populaires</h1>
+      <div class="game-list">
+        <div class="game-card">
+          <img src="https://via.placeholder.com/200x300" alt="Jeu 1" />
+          <h3>Jeu 1</h3>
+          <p>Genre: Action, Aventure</p>
+          <p>Prix: 49.99$</p>
+          <a href="#" class="btn">Acheter</a>
+        </div>
+        <div class="game-card">
+          <img src="https://via.placeholder.com/200x300" alt="Jeu 2" />
+          <h3>Jeu 2</h3>
+          <p>Genre: Stratégie</p>
+          <p>Prix: 49.99$</p>
+          <a href="#" class="btn">Acheter</a>
+        </div>
+        <div class="game-card">
+          <img src="https://via.placeholder.com/200x300" alt="Jeu 3" />
+          <h3>Jeu 3</h3>
+          <p>Genre: RPG</p>
+          <p>Prix: 49.99$</p>
+          <a href="#" class="btn">Acheter</a>
+        </div>
+      </div>
+    </main>
 
-            header {
-                background-color: var(--primary-color);
-                padding: 1rem;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .logo {
-                font-size: 2rem;
-                font-weight: bold;
-                color: var(--text-color);
-            }
-
-            nav ul {
-                list-style-type: none;
-                display: flex;
-            }
-
-            nav ul li {
-                margin-left: 1rem;
-            }
-
-            nav ul li a {
-                color: var(--text-color);
-                text-decoration: none;
-            }
-
-            main {
-                padding: 2rem;
-            }
-
-            .game-list {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                gap: 1rem;
-            }
-
-            .game-card {
-                background-color: var(--secondary-color);
-                border-radius: 5px;
-                padding: 1rem;
-                text-align: center;
-            }
-
-            .game-card img {
-                max-width: 100%;
-                height: auto;
-                border-radius: 5px;
-            }
-
-            .game-card h3 {
-                margin-top: 0.5rem;
-                font-size: 1rem;
-            }
-
-            .game-card p {
-                font-size: 0.9rem;
-                color: var(--text-color);
-            }
-
-            .btn {
-                display: inline-block;
-                background-color: var(--accent-color);
-                color: var(--text-color);
-                padding: 0.5rem 1rem;
-                border-radius: 3px;
-                text-decoration: none;
-                font-size: 0.9rem;
-            }
-
-            footer {
-                background-color: var(--primary-color);
-                color: var(--text-color);
-                text-align: center;
-                padding: 1rem;
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-            }
-        </style>
-    </head>
-    <body>
-        <header>
-            <div class="logo">Nuage</div>
-            <nav>
-                <ul>
-                    <li><a href="#">Boutique</a></li>
-                    <li><a href="#">Recherche</a></li>
-                    <li><a href="#">Profil</a></li>
-                    <li><a href="#">Connexion</a></li>
-                </ul>
-            </nav>
-        </header>
-
-        <main>
-            <h1>Jeux populaires</h1>
-            <div class="game-list">
-                <div class="game-card">
-                    <img src="https://via.placeholder.com/200x300" alt="Jeu 1" />
-                    <h3>Jeu 1</h3>
-                    <p>Genre: Action, Aventure</p>
-                    <p>Prix: 49.99$</p>
-                    <a href="#" class="btn">Acheter</a>
-                </div>
-                <div class="game-card">
-                    <img src="https://via.placeholder.com/200x300" alt="Jeu 2" />
-                    <h3>Jeu 2</h3>
-                    <p>Genre: Stratégie</p>
-                    <p>Prix: 49.99$</p>
-                    <a href="#" class="btn">Acheter</a>
-                </div>
-                <div class="game-card">
-                    <img src="https://via.placeholder.com/200x300" alt="Jeu 3" />
-                    <h3>Jeu 3</h3>
-                    <p>Genre: RPG</p>
-                    <p>Prix: 49.99$</p>
-                    <a href="#" class="btn">Acheter</a>
-                </div>
-            </div>
-        </main>
-
-        <footer>
-            <p>&copy; 2024 Nuage. Tous droits réservés.</p>
-        </footer>
-    </body>
+    <footer>
+      <p>&copy; 2024 Nuage. Tous droits réservés.</p>
+    </footer>
+  </body>
 </html>

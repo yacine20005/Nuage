@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='nuage.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Recherche</title>
+</head>
+<body>
+    <header>
+        <div class="logo">Nuage</div>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('boutique') }}">Boutique</a></li>
+                <li><a href="{{ url_for('recherche') }}">Recherche</a></li>
+                <li><a href="#">Profil</a></li>
+                <li><a href="#">Connexion</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1 style="text-align: center;">Recherche de jeux</h1>
+        <form action="{{ url_for('recherche') }}" method="GET">
+            <input type="text" name="query" placeholder="Rechercher un jeu, genre, éditeur ou développeur..." required>
+            <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </form>
+
+        {% if results %}
+            <h2>Résultats de la recherche :</h2>
+            <ul>
+                {% for result in results %}
+                    <li>{{ result }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Nuage. Tous droits réservés.</p>
+    </footer>
+</body>
+</html>
