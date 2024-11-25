@@ -32,21 +32,13 @@
           <p>Prix: 49.99$</p>
           <a href="#" class="btn">Acheter</a>
         </div>
-        <div class="game-card">
-          <img src="https://via.placeholder.com/200x300" alt="Jeu 2" />
-          <h3>Jeu 2</h3>
-          <p>Genre: Stratégie</p>
-          <p>Prix: 49.99$</p>
-          <a href="#" class="btn">Acheter</a>
-        </div>
-        <div class="game-card">
-          <img src="https://via.placeholder.com/200x300" alt="Jeu 3" />
-          <h3>Jeu 3</h3>
-          <p>Genre: RPG</p>
-          <p>Prix: 49.99$</p>
-          <a href="#" class="btn">Acheter</a>
-        </div>
       </div>
+      <div class="game-list">
+        { % for jeu in jeux % }
+          <div class="game-card">
+            <h3>{{ jeu[2] }}</h3>
+            <p>Genre: {{ jeu.] }}</p>
+          
     </main>
 
     <footer>

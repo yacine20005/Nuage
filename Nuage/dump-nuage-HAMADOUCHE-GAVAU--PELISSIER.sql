@@ -49,6 +49,7 @@ CREATE TABLE Jeu (
     idDeveloppeur INT,
     idEditeur INT,
     description_Jeu TEXT,
+    image_path VARCHAR(255), --On stocke le chemin de l'image du jeu pour l'afficher dans l'application--
     PRIMARY KEY (idJeu),
     FOREIGN KEY (idDeveloppeur) REFERENCES Entreprise(idEntreprise),
     FOREIGN KEY (idEditeur) REFERENCES Entreprise(idEntreprise)
@@ -184,6 +185,26 @@ FROM
     )
 GROUP BY 
     e.nomEntreprise, t.date_transaction
+);
+
+CREATE VIEW Boutique AS (
+    SELECT 
+        j.idJeu,
+        j.titre,
+        j.prix,
+        j.date_de_sortie,
+        j.pegi,
+        j.idDeveloppeur,
+        j.idEditeur,
+        j.description_Jeu,
+        j.image_path,
+        STRING_AGG(g.nomGenre, ', ') AS genres
+    FROM 
+        Jeu AS j
+        JOIN JeuGenre AS jg ON j.idJeu = jg.idJeu
+        JOIN Genre AS g ON jg.idGenre = g.idGenre
+    GROUP BY 
+        j.idJeu, j.titre, j.prix, j.date_de_sortie, j.pegi, j.idDeveloppeur, j.idEditeur, j.description_Jeu, j.image_path
 );
 
 
