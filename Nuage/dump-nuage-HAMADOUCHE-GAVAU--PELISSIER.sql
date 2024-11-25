@@ -61,7 +61,7 @@ CREATE TABLE Succes (
     intitule VARCHAR(100) NOT NULL,
     description_Succes TEXT,
     PRIMARY KEY (idSucces),
-    FOREIGN KEY (idJeu) REFERENCES Jeu(idJeu)
+    FOREIGN KEY (idJeu) REFERENCES Jeu(idJeu),
     CONSTRAINT unique_succes UNIQUE (idJeu, intitule) --On vérifie qu'un succès n'est pas dupliqué pour un jeu donné--
 ); 
 
@@ -94,8 +94,8 @@ CREATE TABLE Amitie (
     idJoueur2 INT,
     PRIMARY KEY (idJoueur1, idJoueur2),
     FOREIGN KEY (idJoueur1) REFERENCES Joueur(idJoueur),
-    FOREIGN KEY (idJoueur2) REFERENCES Joueur(idJoueur)
-    CONSTRAINT check_doublon_amitie CHECK (idJoueur1 < idJoueur2), --On vérifie que l'idJoueur1 est plus petit que l'idJoueur2 pour éviter les doublons éventuelles--
+    FOREIGN KEY (idJoueur2) REFERENCES Joueur(idJoueur),
+    CONSTRAINT check_doublon_amitie CHECK (idJoueur1 < idJoueur2) --On vérifie que l'idJoueur1 est plus petit que l'idJoueur2 pour éviter les doublons éventuelles--
 );
 
 CREATE TABLE Partage (
@@ -164,30 +164,26 @@ GROUP BY
 
 CREATE VIEW RapportVentes AS
 (
-SELECT 
-    e.nomEntreprise AS Entreprise, --On récupère le nom de l'entreprise--
-    t.date_transaction AS Date, --On récupère la date pour séparer les stats par date--
-    COUNT(DISTINCT t.idTransaction) AS NombreVentes, --On compte le nombre de ventes différentes--
-    COUNT(DISTINCT p.idJeu) AS NombrePrets, --On compte le nombre de prêts différents--
-    SUM(t.montant) AS ChiffreAffaire, --On somme les montants des transactions pour obtenir le chiffre d'affaire total--
-    NotationMoyenne --On calcule la moyenne des notes des commentaires pour obtenir la notation moyenne--
-    --Manque les succès obtenus dans le jeu--
-FROM 
-    Jeu AS j
-    JOIN Entreprise AS e ON j.idEditeur = e.idEntreprise
-    LEFT JOIN Transaction_user AS t ON j.idJeu = t.idJeu
-    LEFT JOIN Partage AS p ON j.idJeu = p.idJeu
-    LEFT JOIN Commentaire AS c ON j.idJeu = c.idJeu
-    (
-        SELECT AVG(note) AS NotationMoyenne 
-        from Commentaire
-        Group by date_commentaire
-    )
-GROUP BY 
-    e.nomEntreprise, t.date_transaction
+    SELECT 
+        e.nomEntreprise AS Entreprise, --On récupère le nom de l'entreprise--
+        t.date_transaction AS Date, --On récupère la date pour séparer les stats par date--
+        COUNT(DISTINCT t.idTransaction) AS NombreVentes, --On compte le nombre de ventes différentes--
+        COUNT(DISTINCT p.idJeu) AS NombrePrets, --On compte le nombre de prêts différents--
+        SUM(t.montant) AS ChiffreAffaire, --On somme les montants des transactions pour obtenir le chiffre d'affaire total--
+        AVG(c.note) AS NotationMoyenne --On calcule la moyenne des notes des commentaires pour obtenir la notation moyenne--
+        --Manque les succès obtenus dans le jeu--
+    FROM 
+        Jeu AS j
+        JOIN Entreprise AS e ON j.idEditeur = e.idEntreprise
+        LEFT JOIN Transaction_user AS t ON j.idJeu = t.idJeu
+        LEFT JOIN Partage AS p ON j.idJeu = p.idJeu
+        LEFT JOIN Commentaire AS c ON j.idJeu = c.idJeu
+    GROUP BY 
+        e.nomEntreprise, t.date_transaction
 );
 
-CREATE VIEW Boutique AS (
+CREATE VIEW Boutique AS 
+(
     SELECT 
         j.idJeu,
         j.titre,
@@ -204,7 +200,7 @@ CREATE VIEW Boutique AS (
         JOIN JeuGenre AS jg ON j.idJeu = jg.idJeu
         JOIN Genre AS g ON jg.idGenre = g.idGenre
     GROUP BY 
-        j.idJeu, j.titre, j.prix, j.date_de_sortie, j.pegi, j.idDeveloppeur, j.idEditeur, j.description_Jeu, j.image_path
+        j.idJeu, j.titre, j.prix, j.date_de_sortie, j.pegi, j.idDeveloppeur, j.idEditeur, j.description_Jeu, j.image_path, g.nomGenre
 );
 
 
@@ -220,8 +216,8 @@ INSERT INTO Entreprise VALUES (3, 'EA', 'États-Unis'); --EA est une entreprise 
 INSERT INTO Genre VALUES (1, 'RPG'); --Définition du genre RPG--
 INSERT INTO Genre VALUES (2, 'Course'); --Définition du genre Course--
 
-INSERT INTO Jeu VALUES (1, 'Cyberpunk 2077', 69.99, '2020-12-10', 18, 1, 1, 'RPG dans un futur cyberpunk'); --CD Projekt Red est le développeur et l'éditeur du jeu en même temps--
-INSERT INTO Jeu VALUES (2, 'Need for speed Unbound', 39.99, '2022-11-29', 12, 2, 3, 'Jeu de course de rue'); --Criterion est le développeur et EA est l'éditeur du jeu --
+INSERT INTO Jeu VALUES (1, 'Cyberpunk 2077', 69.99, '2020-12-10', 18, 1, 1, 'RPG dans un futur cyberpunk', '/images/cyberpunk2077.jpg'); --CD Projekt Red est le développeur et l'éditeur du jeu en même temps--
+INSERT INTO Jeu VALUES (2, 'Need for speed Unbound', 39.99, '2022-11-29', 12, 2, 3, 'Jeu de course de rue', '/images/nfs_unbound.jpg'); --Criterion est le développeur et EA est l'éditeur du jeu --
 
 INSERT INTO Succes VALUES (1, 1, 'Braquage Konpeki Plaza', 'Vous avez eu ce que vous vouliez mais à quel prix ?'); --Succès du jeu Cyberpunk 2077--
 INSERT INTO Succes VALUES (2, 2, 'Insaisissable', 'Échappez à une poursuite policière en Alerte 5 au volant d’une voiture A+'); --Succès du jeu NFS Unbound--

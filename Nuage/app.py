@@ -1,6 +1,3 @@
-import random
-import os
-from werkzeug.utils import secure_filename # Permet de sécuriser le nom du fichier
 import time
 import flask
 import db
@@ -14,7 +11,7 @@ def boutique():
     m = time.localtime().tm_min
     s = time.localtime().tm_sec
     conn = db.connect()
-    cur = conn.cursor()
+    cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
     cur.execute('SELECT * FROM Boutique;')
     jeux = cur.fetchall()
     print(jeux)
@@ -26,17 +23,5 @@ def boutique():
 def recherche():
     return flask.render_template("recherche.html")
 
-@app.route('/upload', methods=['POST']) # Route pour l'upload de fichier
-def upload_file():
-    if 'file' not in flask.request.files: # Vérifier si un fichier a été envoyé
-        return 'No file part'
-    file = flask.request.files['file'] # Récupérer le fichier
-    if file.filename == '': # Vérifier si le fichier a un nom
-        return 'No selected file'
-    if file: # Si le fichier est correct
-        filename = secure_filename(file.filename) # Sécuriser le nom du fichier
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename)) # Enregistrer le fichier
-        return flask.redirect(flask.url_for('uploaded_file', filename=filename))
-    
 if __name__ == '__main__':
     app.run(debug=True)
