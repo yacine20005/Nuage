@@ -14,7 +14,6 @@ def boutique():
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
     cur.execute('SELECT * FROM Boutique;')
     jeux = cur.fetchall()
-    print(jeux)
     cur.close()
     conn.close()
     return flask.render_template("boutique.html", h = h, m = m, s = s, jeux = jeux)
@@ -22,6 +21,16 @@ def boutique():
 @app.route("/recherche")
 def recherche():
     return flask.render_template("recherche.html")
+
+@app.route("/jeu/<int:id>")
+def jeu(id):
+    conn = db.connect()
+    cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
+    cur.execute("SELECT * FROM Boutique WHERE idjeu = %s;", (id,)) #A modifier car risque d'injection SQL
+    jeux = cur.fetchall()
+    cur.close()
+    conn.close()
+    return flask.render_template("jeu.html", jeux=jeux)
 
 if __name__ == '__main__':
     app.run(debug=True)

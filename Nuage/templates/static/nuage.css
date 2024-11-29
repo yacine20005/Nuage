@@ -7,7 +7,6 @@
 }
 
 body {
-  font-family: "Century Gothic";
   margin: 0;
   padding: 0;
   background-color: var(--background-color);
@@ -83,6 +82,30 @@ main {
   border-radius: 3px;
   text-decoration: none;
   font-size: 0.9rem;
+}
+.btn:hover {
+  background-color: #3d0000;
+}
+
+.centered-div {
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 3rem; /* 1rem est égal à la taille de la police de l'élément racine */
+  display: flex;
+  align-items: flex-start; /* Aligne le texte au début de l'image */
+}
+
+.centered-image {
+  display: block;
+  width: 70%;
+  margin-top: 1rem;
+  height: auto;
+}
+
+.text-content {
+  text-align: left;
+  margin-left: 2rem; /* Ajoute un espace entre l'image et le texte */
 }
 
 footer {

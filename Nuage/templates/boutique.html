@@ -7,6 +7,9 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='nuage.css') }}"
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
     <title>Nuage</title>
   </head>
   <body>
@@ -31,6 +34,7 @@
             <h3>{{ jeu.titre }}</h3>
             <p>Genre: {{ jeu.genres }}</p>
             <p>Prix: {{ jeu.prix }}$</p>
+            <a href="{{ url_for('jeu', id=jeu.idjeu) }}" class=btn>Acheter</a>
           </div>
         {% endfor %}
     </main>

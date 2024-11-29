@@ -7,17 +7,13 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='nuage.css') }}"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Questrial&display=swap"
       rel="stylesheet"
     />
-    <title>Recherche</title>
+    <title>Nuage</title>
   </head>
   <body>
     <header>
@@ -33,27 +29,23 @@
     </header>
 
     <main>
-      <h1 style="text-align: center">Recherche de jeux</h1>
-      <form action="{{ url_for('recherche') }}" method="GET">
-        <input
-          type="text"
-          name="query"
-          placeholder="Rechercher un jeu, genre, éditeur ou développeur..."
-          required
+      {% for jeu in jeux %}
+      <div class="centered-div">
+        <img
+          class="centered-image"
+          src="{{ url_for('static', filename=jeu.image_path) }}"
+          alt="{{ jeu.titre }}"
         />
-        <button type="submit">
-          <i class="fa-solid fa-magnifying-glass"></i>
-        </button>
-      </form>
+        <div class="text-content">
+          <h3>{{ jeu.titre }}</h3>
+          <p>Genre: {{ jeu.genres }}</p>
+          <p>Prix: {{ jeu.prix }}$</p>
+          <br />
+          <a href="{{ url_for('jeu', id=jeu.idjeu) }}" class="btn">Acheter</a>
+        </div>
+      </div>
 
-      {% if results %}
-      <h2>Résultats de la recherche :</h2>
-      <ul>
-        {% for result in results %}
-        <li>{{ result }}</li>
-        {% endfor %}
-      </ul>
-      {% endif %}
+      {% endfor %}
     </main>
 
     <footer>
