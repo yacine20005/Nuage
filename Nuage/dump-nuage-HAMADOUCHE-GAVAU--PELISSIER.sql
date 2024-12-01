@@ -13,6 +13,7 @@ DROP TABLE IF EXISTS JoueurJeu CASCADE;
 DROP TABLE IF EXISTS JoueurSucces CASCADE;
 DROP TABLE IF EXISTS JeuGenre CASCADE;
 DROP VIEW IF EXISTS RapportVentes;
+DROP VIEW IF EXISTS Boutique;
 
 ---<Tables>---
 
@@ -177,7 +178,7 @@ CREATE VIEW Boutique AS
         j.description_Jeu AS description,
         j.image_path,
         STRING_AGG(g.nomGenre, ', ') AS genres,
-        AVG(c.note) AS NoteMoyenne -- Utilise 0 si aucun commentaire n'est disponible
+        ROUND(AVG(c.note), 0) AS noteMoyenne --ROUND permet d'arrondir la note moyenne à 2 chiffres après la virgule--
     FROM 
         Jeu AS j
         JOIN JeuGenre AS jg ON j.idJeu = jg.idJeu
@@ -186,9 +187,8 @@ CREATE VIEW Boutique AS
         JOIN Entreprise AS ed ON j.idEditeur = ed.idEntreprise
         JOIN Commentaire AS c ON j.idJeu = c.idJeu
     GROUP BY 
-        j.idJeu, j.titre, j.prix, j.date_de_sortie, j.pegi, j.idDeveloppeur, j.idEditeur, j.description_Jeu, j.image_path, g.nomGenre, d.nomEntreprise, ed.nomEntreprise, c.note
+        j.idJeu, j.titre, j.prix, j.date_de_sortie, j.pegi, j.idDeveloppeur, j.idEditeur, j.description_Jeu, j.image_path, d.nomEntreprise, ed.nomEntreprise
 );
-
 
 ---<Insertions>---
 
@@ -202,8 +202,8 @@ INSERT INTO Entreprise VALUES (3, 'EA', 'États-Unis'); --EA est une entreprise 
 INSERT INTO Genre VALUES (1, 'RPG'); --Définition du genre RPG--
 INSERT INTO Genre VALUES (2, 'Course'); --Définition du genre Course--
 
-INSERT INTO Jeu VALUES (1, 'Cyberpunk 2077', 69.99, '2020-12-10', 18, 1, 1, 'RPG dans un futur cyberpunk', '/images/cyberpunk2077.jpg'); --CD Projekt Red est le développeur et l'éditeur du jeu en même temps--
-INSERT INTO Jeu VALUES (2, 'Need for speed Unbound', 39.99, '2022-11-29', 12, 2, 3, 'Jeu de course de rue', '/images/nfs_unbound.jpg'); --Criterion est le développeur et EA est l'éditeur du jeu --
+INSERT INTO Jeu VALUES (1, 'Cyberpunk 2077', 69.99, '2020-12-10', 18, 1, 1, 'Cyberpunk 2077 est un JDR d''action-aventure en monde ouvert, qui se déroule à Night City, une mégalopole futuriste et sombre, obsédée par le pouvoir, la séduction et les modifications corporelles.', '/images/cyberpunk2077.jpg'); --CD Projekt Red est le développeur et l'éditeur du jeu en même temps--
+INSERT INTO Jeu VALUES (2, 'Need for speed Unbound', 39.99, '2022-11-29', 12, 2, 3, 'Pour atteindre le sommet, pas le droit à l’erreur ! Défiez la police et participez aux qualifications pour participer au Grand, la course de rue ultime. Sublimez votre garage avec des voitures ultra personalisées, et brillez grâce à votre style unique.', '/images/nfs_unbound.jpg'); --Criterion est le développeur et EA est l'éditeur du jeu --
 
 INSERT INTO Succes VALUES (1, 1, 'Braquage Konpeki Plaza', 'Vous avez eu ce que vous vouliez mais à quel prix ?'); --Succès du jeu Cyberpunk 2077--
 INSERT INTO Succes VALUES (2, 2, 'Insaisissable', 'Échappez à une poursuite policière en Alerte 5 au volant d’une voiture A+'); --Succès du jeu NFS Unbound--

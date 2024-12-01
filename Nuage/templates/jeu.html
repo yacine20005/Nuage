@@ -43,22 +43,30 @@
           <p>Date de sortie : {{ jeu.date_de_sortie }}</p>
           <p>Développeur : {{ jeu.developpeur }}</p>
           <p>Éditeur : {{ jeu.editeur }}</p>
-          <p>Description : {{ jeu.description }}</p>
           <p>Prix : {{ jeu.prix }}$</p>
-          <p>Note : {{ jeu.NoteMoyenne }}</p>
+          <p>Note : {{ jeu.notemoyenne }}</p>
           <br />
           <a href="{{ url_for('jeu', id=jeu.idjeu) }}" class="btn">Acheter</a>
         </div>
+      </div>
+      <div class="text-content">
+        <h2>Description</h2>
+        <p>{{ jeu.description }}</p>
       </div>
       {% endfor %}
 
       <div class="centered-div">
         <h2>Commentaires</h2>
+        <br />
         {% for commentaire in commentaires %}
         <div class="comment">
-          <p><strong>{{ commentaire.idJoueur }}</strong> : {{ commentaire.texteCommentaire }}</p>
+          <p>
+            <strong>{{ commentaire.idjoueur }}</strong> : {{
+            commentaire.textecommentaire }}
+          </p>
         </div>
         {% endfor %}
+      </div>
     </main>
 
     <footer>

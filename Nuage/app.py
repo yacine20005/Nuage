@@ -29,6 +29,7 @@ def jeu(id):
     
     cur.execute("SELECT * FROM Boutique WHERE idjeu = %s;", (id,))  # Utilisation de paramètres préparés pour éviter l'injection SQL car psycopg2 se charge de gérer la valeur
     jeux = cur.fetchall()
+    print(jeux)
     
     cur.execute("SELECT * FROM Commentaire WHERE idjeu = %s;", (id,))
     commentaires = cur.fetchall()
