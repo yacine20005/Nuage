@@ -38,8 +38,9 @@
         />
         <div class="text-content">
           <h3>{{ jeu.titre }}</h3>
-          <p>Genre: {{ jeu.genres }}</p>
-          <p>Prix: {{ jeu.prix }}$</p>
+          <p>Genre : {{ jeu.genres }}</p>
+          <p>Prix : {{ jeu.prix }}$</p>
+          <p>PEGI : {{ jeu.plateforme }}</p>
           <br />
           <a href="{{ url_for('jeu', id=jeu.idjeu) }}" class="btn">Acheter</a>
         </div>

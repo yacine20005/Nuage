@@ -172,6 +172,8 @@ CREATE VIEW Boutique AS
         j.pegi,
         j.idDeveloppeur,
         j.idEditeur,
+        d.nomEntreprise AS developpeur,
+        ed.nomEntreprise AS editeur,
         j.description_Jeu,
         j.image_path,
         STRING_AGG(g.nomGenre, ', ') AS genres
@@ -179,10 +181,10 @@ CREATE VIEW Boutique AS
         Jeu AS j
         JOIN JeuGenre AS jg ON j.idJeu = jg.idJeu
         JOIN Genre AS g ON jg.idGenre = g.idGenre
-        JOIN Entreprise AS e ON j.idDeveloppeur = e.idEntreprise
+        JOIN Entreprise AS d ON j.idDeveloppeur = d.idEntreprise
         JOIN Entreprise AS ed ON j.idEditeur = ed.idEntreprise
     GROUP BY 
-        j.idJeu, j.titre, j.prix, j.date_de_sortie, j.pegi, j.idDeveloppeur, j.idEditeur, j.description_Jeu, j.image_path, g.nomGenre
+        j.idJeu, j.titre, j.prix, j.date_de_sortie, j.pegi, j.idDeveloppeur, j.idEditeur, j.description_Jeu, j.image_path, g.nomGenre, d.nomEntreprise, ed.nomEntreprise, d.nomEntreprise
 );
 
 
