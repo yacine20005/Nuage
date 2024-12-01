@@ -142,26 +142,6 @@ CREATE TABLE JeuGenre (
 
 ---<Vues>---
 
-/*CREATE VIEW RapportVentes AS
-(
-SELECT 
-    e.nomEntreprise AS Entreprise, --On récupère le nom de l'entreprise--
-    t.date_transaction AS Date, --On récupère la date pour séparer les stats par date--
-    COUNT(DISTINCT t.idTransaction) AS NombreVentes, --On compte le nombre de ventes différentes--
-    COUNT(DISTINCT p.idJeu) AS NombrePrets, --On compte le nombre de prêts différents--
-    SUM(t.montant) AS ChiffreAffaire, --On somme les montants des transactions pour obtenir le chiffre d'affaire total--
-    AVG(c.note) AS NotationMoyenne --On calcule la moyenne des notes des commentaires pour obtenir la notation moyenne--
-    --Manque les succès obtenus dans le jeu--
-FROM 
-    Jeu AS j
-    JOIN Entreprise AS e ON j.idEditeur = e.idEntreprise
-    LEFT JOIN Transaction_user AS t ON j.idJeu = t.idJeu
-    LEFT JOIN Partage AS p ON j.idJeu = p.idJeu
-    LEFT JOIN Commentaire AS c ON j.idJeu = c.idJeu
-GROUP BY 
-    e.nomEntreprise, t.date_transaction
-);*/
-
 CREATE VIEW RapportVentes AS
 (
     SELECT 
@@ -199,6 +179,8 @@ CREATE VIEW Boutique AS
         Jeu AS j
         JOIN JeuGenre AS jg ON j.idJeu = jg.idJeu
         JOIN Genre AS g ON jg.idGenre = g.idGenre
+        JOIN Entreprise AS e ON j.idDeveloppeur = e.idEntreprise
+        JOIN Entreprise AS ed ON j.idEditeur = ed.idEntreprise
     GROUP BY 
         j.idJeu, j.titre, j.prix, j.date_de_sortie, j.pegi, j.idDeveloppeur, j.idEditeur, j.description_Jeu, j.image_path, g.nomGenre
 );

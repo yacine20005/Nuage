@@ -26,7 +26,7 @@ def recherche():
 def jeu(id):
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
-    cur.execute("SELECT * FROM Boutique WHERE idjeu = %s;", (id,)) #A modifier car risque d'injection SQL
+    cur.execute("SELECT * FROM Boutique WHERE idjeu = %s;", (id,))  # Utilisation de paramètres préparés pour éviter l'injection SQL car psycopg2 se charge de gérer la valeur
     jeux = cur.fetchall()
     cur.close()
     conn.close()
