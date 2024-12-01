@@ -106,6 +106,13 @@ main {
   height: auto;
 }
 
+.title-game{
+  display: block;
+  width: 70%;
+  margin-top: 0rem;
+  height: auto;
+}
+
 .text-content {
   text-align: left;
   margin-left: 2rem; /* Ajoute un espace entre l'image et le texte */

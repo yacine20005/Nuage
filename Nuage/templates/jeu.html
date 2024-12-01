@@ -30,6 +30,7 @@
 
     <main>
       {% for jeu in jeux %}
+      <h1 style="text-align: center">{{ jeu.titre }}</h1>
       <div class="centered-div">
         <img
           class="centered-image"
@@ -37,20 +38,27 @@
           alt="{{ jeu.titre }}"
         />
         <div class="text-content">
-          <h3>{{ jeu.titre }}</h3>
           <p>Genre : {{ jeu.genres }}</p>
           <p>PEGI : {{ jeu.pegi }}</p>
           <p>Date de sortie : {{ jeu.date_de_sortie }}</p>
           <p>Développeur : {{ jeu.developpeur }}</p>
           <p>Éditeur : {{ jeu.editeur }}</p>
-          <p>Description : {{ jeu.description_Jeu }}</p>
+          <p>Description : {{ jeu.description }}</p>
           <p>Prix : {{ jeu.prix }}$</p>
+          <p>Note : {{ jeu.NoteMoyenne }}</p>
           <br />
           <a href="{{ url_for('jeu', id=jeu.idjeu) }}" class="btn">Acheter</a>
         </div>
       </div>
-
       {% endfor %}
+
+      <div class="centered-div">
+        <h2>Commentaires</h2>
+        {% for commentaire in commentaires %}
+        <div class="comment">
+          <p><strong>{{ commentaire.idJoueur }}</strong> : {{ commentaire.texteCommentaire }}</p>
+        </div>
+        {% endfor %}
     </main>
 
     <footer>

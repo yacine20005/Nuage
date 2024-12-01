@@ -174,17 +174,19 @@ CREATE VIEW Boutique AS
         j.idEditeur,
         d.nomEntreprise AS developpeur,
         ed.nomEntreprise AS editeur,
-        j.description_Jeu,
+        j.description_Jeu AS description,
         j.image_path,
-        STRING_AGG(g.nomGenre, ', ') AS genres
+        STRING_AGG(g.nomGenre, ', ') AS genres,
+        AVG(c.note) AS NoteMoyenne -- Utilise 0 si aucun commentaire n'est disponible
     FROM 
         Jeu AS j
         JOIN JeuGenre AS jg ON j.idJeu = jg.idJeu
         JOIN Genre AS g ON jg.idGenre = g.idGenre
         JOIN Entreprise AS d ON j.idDeveloppeur = d.idEntreprise
         JOIN Entreprise AS ed ON j.idEditeur = ed.idEntreprise
+        JOIN Commentaire AS c ON j.idJeu = c.idJeu
     GROUP BY 
-        j.idJeu, j.titre, j.prix, j.date_de_sortie, j.pegi, j.idDeveloppeur, j.idEditeur, j.description_Jeu, j.image_path, g.nomGenre, d.nomEntreprise, ed.nomEntreprise, d.nomEntreprise
+        j.idJeu, j.titre, j.prix, j.date_de_sortie, j.pegi, j.idDeveloppeur, j.idEditeur, j.description_Jeu, j.image_path, g.nomGenre, d.nomEntreprise, ed.nomEntreprise, c.note
 );
 
 

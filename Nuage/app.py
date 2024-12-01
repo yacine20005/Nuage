@@ -26,11 +26,16 @@ def recherche():
 def jeu(id):
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
+    
     cur.execute("SELECT * FROM Boutique WHERE idjeu = %s;", (id,))  # Utilisation de paramètres préparés pour éviter l'injection SQL car psycopg2 se charge de gérer la valeur
     jeux = cur.fetchall()
+    
+    cur.execute("SELECT * FROM Commentaire WHERE idjeu = %s;", (id,))
+    commentaires = cur.fetchall()
+    
     cur.close()
     conn.close()
-    return flask.render_template("jeu.html", jeux=jeux)
+    return flask.render_template("jeu.html", jeux=jeux, commentaires=commentaires)
 
 if __name__ == '__main__':
     app.run(debug=True)
