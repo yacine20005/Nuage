@@ -44,8 +44,9 @@ nav ul li a {
   text-decoration: none;
 }
 
-main {
+main {    
   padding: 2rem;
+  padding-bottom: 100px;
 }
 
 .game-list {
@@ -116,6 +117,18 @@ main {
 .text-content {
   text-align: left;
   margin-left: 2rem; /* Ajoute un espace entre l'image et le texte */
+}
+
+.text-descr {
+  margin-left: -8rem;
+  margin-top: 3rem;
+  padding : auto;
+}
+
+.text-comm {
+  margin-left: -10rem;
+  margin-top: 3rem;
+  padding : auto;
 }
 
 footer {

@@ -49,23 +49,28 @@
           <a href="{{ url_for('jeu', id=jeu.idjeu) }}" class="btn">Acheter</a>
         </div>
       </div>
-      <div class="text-content">
+      <div class="centered-div">
         <h2>Description</h2>
-        <p>{{ jeu.description }}</p>
+        <div class="text-descr">
+          <p>{{ jeu.description }}</p>
+        </div>
       </div>
+
       {% endfor %}
 
       <div class="centered-div">
         <h2>Commentaires</h2>
-        <br />
+        <div class="text-comm">
         {% for commentaire in commentaires %}
-        <div class="comment">
           <p>
             <strong>{{ commentaire.idjoueur }}</strong> : {{
             commentaire.textecommentaire }}
           </p>
-        </div>
+          <br />
+        
+        
         {% endfor %}
+        </div>
       </div>
     </main>
 
