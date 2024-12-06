@@ -17,7 +17,7 @@
       href="https://fonts.googleapis.com/css2?family=Questrial&display=swap"
       rel="stylesheet"
     />
-    <title>Recherche - Nuage</title>
+    <title>Connexion - Nuage</title>
   </head>
   <body>
     <header>
@@ -33,29 +33,21 @@
       </nav>
     </header>
     <main>
-      <h1 style="text-align: center">Recherche de jeux</h1>
-
-      <form action="{{ url_for('recherche') }}" method="GET">
-        <input
-          type="text"
-          name="recherche"
-          placeholder="Rechercher un jeu, genre, éditeur ou développeur..."
-          required
-        />
-
-        <button type="submit">
-          <i class="fa-solid fa-magnifying-glass"></i>
-        </button>
-      </form>
-
-      {% if results %}
-      <h2>Résultats de la recherche :</h2>
-      <ul>
-        {% for result in results %}
-        <li>{{ result }}</li>
-        {% endfor %}
-      </ul>
-      {% endif %}
+      <h1 style="text-align: center">Connexion</h1>
+        <form action="{{ url_for('connexion') }}" method="POST">
+            <input
+            type="text"
+            name="user"
+            placeholder="Nom d'utilisateur ou adresse mail"
+            required
+            />
+            <input
+            type="password"
+            name="password"
+            placeholder="Mot de passe"
+            required
+            />
+            <button type="submit">Se connecter</button>
     </main>
 
     <footer>

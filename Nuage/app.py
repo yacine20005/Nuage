@@ -3,7 +3,6 @@ import flask
 import db
 
 app = flask.Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'static/uploads' # Dossier de stockage des fichiers
 
 @app.route("/boutique")
 def boutique():
@@ -22,6 +21,14 @@ def boutique():
 def recherche():
     return flask.render_template("recherche.html")
 
+@app.route("/connexion")
+def connexion():
+    return flask.render_template("connexion.html")
+
+@app.route("/inscription")
+def inscription():
+    return flask.render_template("inscription.html")
+
 @app.route("/jeu/<int:id>")
 def jeu(id):
     conn = db.connect()
@@ -29,9 +36,8 @@ def jeu(id):
     
     cur.execute("SELECT * FROM Boutique WHERE idjeu = %s;", (id,))  # Utilisation de paramètres préparés pour éviter l'injection SQL car psycopg2 se charge de gérer la valeur
     jeux = cur.fetchall()
-    print(jeux)
-    
-    cur.execute("SELECT * FROM Commentaire WHERE idjeu = %s;", (id,))
+        
+    cur.execute("SELECT * FROM CommentaireJeu WHERE idjeu = %s;", (id,))
     commentaires = cur.fetchall()
     
     cur.close()

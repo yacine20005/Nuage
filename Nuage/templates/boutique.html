@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">
-    <title>Nuage</title>
+    <title>Boutique - Nuage</title>
   </head>
   <body>
     <header>
@@ -20,13 +20,14 @@
           <li><a href="{{ url_for('boutique') }}">Boutique</a></li>
           <li><a href="{{ url_for('recherche') }}">Recherche</a></li>
           <li><a href="#">Profil</a></li>
-          <li><a href="#">Connexion</a></li>
+          <li><a href="{{ url_for('connexion') }}">Connexion</a></li>
+          <li><a href="{{ url_for('inscription') }}">inscription</a></li>
         </ul>
       </nav>
     </header>
 
     <main>
-      <h1>Jeux populaires</h1>
+      <h1 style="text-align: center">Jeux populaires</h1>
       <div class="game-list">
         {% for jeu in jeux %}
           <div class="game-card">

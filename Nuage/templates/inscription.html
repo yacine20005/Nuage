@@ -17,7 +17,7 @@
       href="https://fonts.googleapis.com/css2?family=Questrial&display=swap"
       rel="stylesheet"
     />
-    <title>Recherche - Nuage</title>
+    <title>inscription - Nuage</title>
   </head>
   <body>
     <header>
@@ -33,29 +33,49 @@
       </nav>
     </header>
     <main>
-      <h1 style="text-align: center">Recherche de jeux</h1>
+      <h1 style="text-align: center">Inscription</h1>
+        <form class="inscription" action="{{ url_for('inscription') }}" method="POST">
+            
+            <input
+            class = "inscription"
+            type="text"
+            name="non"
+            placeholder="Nom"
+            required
+            />
+            
+            <input
+            class = "inscription"
+            type="email"
+            name="email"
+            placeholder="Adresse mail"
+            required
+            />
 
-      <form action="{{ url_for('recherche') }}" method="GET">
-        <input
-          type="text"
-          name="recherche"
-          placeholder="Rechercher un jeu, genre, éditeur ou développeur..."
-          required
-        />
+            <input
+            class = "inscription"
+            type="text"
+            name="user"
+            placeholder="Nom d'utilisateur"
+            required
+            />
 
-        <button type="submit">
-          <i class="fa-solid fa-magnifying-glass"></i>
-        </button>
-      </form>
+            <input
+            type="password"
+            name="password"
+            placeholder="Mot de passe"
+            required
+            />
 
-      {% if results %}
-      <h2>Résultats de la recherche :</h2>
-      <ul>
-        {% for result in results %}
-        <li>{{ result }}</li>
-        {% endfor %}
-      </ul>
-      {% endif %}
+            <input
+            class = "inscription"
+            type="date"
+            name="date_de_naissance"
+            placeholder="Date de naissance"
+            required
+            />
+
+            <button type="submit">Rejoindre le nuage</button>
     </main>
 
     <footer>

@@ -13,7 +13,7 @@
       href="https://fonts.googleapis.com/css2?family=Questrial&display=swap"
       rel="stylesheet"
     />
-    <title>Nuage</title>
+    <title>Jeu - Nuage</title>
   </head>
   <body>
     <header>
@@ -23,7 +23,8 @@
           <li><a href="{{ url_for('boutique') }}">Boutique</a></li>
           <li><a href="{{ url_for('recherche') }}">Recherche</a></li>
           <li><a href="#">Profil</a></li>
-          <li><a href="#">Connexion</a></li>
+          <li><a href="{{ url_for('connexion') }}">Connexion</a></li>
+          <li><a href="{{ url_for('inscription') }}">inscription</a></li>
         </ul>
       </nav>
     </header>
@@ -55,21 +56,19 @@
           <p>{{ jeu.description }}</p>
         </div>
       </div>
-
       {% endfor %}
 
       <div class="centered-div">
         <h2>Commentaires</h2>
         <div class="text-comm">
-        {% for commentaire in commentaires %}
-          <p>
-            <strong>{{ commentaire.idjoueur }}</strong> : {{
+          {% for commentaire in commentaires %}
+          <p class="text-comm-card">
+            <strong class="align-right">{{ commentaire.note }}/20</strong>
+            <br />
+            <strong>{{ commentaire.pseudo }}</strong> : {{
             commentaire.textecommentaire }}
           </p>
-          <br />
-        
-        
-        {% endfor %}
+          {% endfor %}
         </div>
       </div>
     </main>

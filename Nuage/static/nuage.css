@@ -24,12 +24,6 @@ header {
   align-items: center;
 }
 
-.logo {
-  font-size: 2rem;
-  font-weight: bold;
-  color: var(--text-color);
-}
-
 nav ul {
   list-style-type: none;
   display: flex;
@@ -44,9 +38,56 @@ nav ul li a {
   text-decoration: none;
 }
 
-main {    
+main {
   padding: 2rem;
   padding-bottom: 100px;
+}
+
+form {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+input {
+  width: 400px;
+  padding: 10px;
+  background-color: #1c1c1c;
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+  font-size: 16px;
+  color: white;
+}
+
+button[type="submit"] {
+  padding: 10px 20px;
+  border: 2px solid #ccc;
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+  background-color: #950101;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background-color: #3d0000;
+}
+
+footer {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  text-align: center;
+  padding: 1rem;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+.logo {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--text-color);
 }
 
 .game-list {
@@ -95,7 +136,7 @@ main {
   width: 50%;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 3rem; /* 1rem est égal à la taille de la police de l'élément racine */
+  margin-top: 3rem;
   display: flex;
   align-items: flex-start; /* Aligne le texte au début de l'image */
 }
@@ -107,7 +148,7 @@ main {
   height: auto;
 }
 
-.title-game{
+.title-game {
   display: block;
   width: 70%;
   margin-top: 0rem;
@@ -122,53 +163,28 @@ main {
 .text-descr {
   margin-left: -8rem;
   margin-top: 3rem;
-  padding : auto;
+  padding: auto;
 }
 
 .text-comm {
   margin-left: -10rem;
   margin-top: 3rem;
-  padding : auto;
+  padding: auto;
 }
 
-footer {
-  background-color: var(--primary-color);
-  color: var(--text-color);
-  text-align: center;
+.text-comm-card {
+  background-color: var(--secondary-color);
+  border-radius: 5px;
   padding: 1rem;
-  position: fixed;
-  bottom: 0;
+}
+
+form .inscription input {
   width: 100%;
-}
-
-/* Styles pour la barre de recherche */
-
-form {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
-}
-
-input[type="text"] {
-  width: 400px;
   padding: 10px;
   background-color: #1c1c1c;
   border: 1px solid #ccc;
-  border-radius: 4px 0 0 4px;
+  border-radius: 4px;
   font-size: 16px;
-}
-
-button[type="submit"] {
-  padding: 10px 20px;
-  border: 2px solid #ccc;
-  border-left: none;
-  border-radius: 0 4px 4px 0;
-  background-color: #950101;
   color: white;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-button[type="submit"]:hover {
-  background-color: #3d0000;
+  margin-bottom: 10px; /* Add space between inputs */
 }

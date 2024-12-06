@@ -177,7 +177,7 @@ CREATE VIEW Boutique AS
         ed.nomEntreprise AS editeur,
         j.description_Jeu AS description,
         j.image_path,
-        STRING_AGG(g.nomGenre, ', ') AS genres,
+        STRING_AGG(DISTINCT g.nomGenre, ', ') AS genres, -- STRING_AGG permet de concaténer les genres en une seule chaîne de caractères séparée par des virgules--
         ROUND(AVG(c.note), 0) AS noteMoyenne --ROUND permet d'arrondir la note moyenne à 2 chiffres après la virgule--
     FROM 
         Jeu AS j
@@ -186,8 +186,29 @@ CREATE VIEW Boutique AS
         JOIN Entreprise AS d ON j.idDeveloppeur = d.idEntreprise
         JOIN Entreprise AS ed ON j.idEditeur = ed.idEntreprise
         JOIN Commentaire AS c ON j.idJeu = c.idJeu
-    GROUP BY 
+    GROUP BY --Il faut qu'on fasse le group by avec le reste des attributs hors des agrégations pour que les fonctions fonctionnent correctement--
         j.idJeu, j.titre, j.prix, j.date_de_sortie, j.pegi, j.idDeveloppeur, j.idEditeur, j.description_Jeu, j.image_path, d.nomEntreprise, ed.nomEntreprise
+);
+
+CREATE VIEW CommentaireJeu AS
+(
+    SELECT 
+        j.titre AS Jeu,
+        c.note AS Note,
+        c.texteCommentaire AS texteCommentaire,
+        c.idJoueur As Joueur,
+        j.idJeu,
+        jo.pseudo AS Pseudo,
+        j.idDeveloppeur,
+        j.idEditeur,
+        d.nomEntreprise AS Developpeur,
+        ed.nomEntreprise AS Editeur
+    FROM 
+        Jeu AS j
+        JOIN Commentaire AS c ON j.idJeu = c.idJeu
+        JOIN Entreprise AS d ON j.idDeveloppeur = d.idEntreprise
+        JOIN Entreprise AS ed ON j.idEditeur = ed.idEntreprise
+        JOIN Joueur AS jo ON c.idJoueur = jo.idJoueur
 );
 
 ---<Insertions>---
@@ -201,6 +222,7 @@ INSERT INTO Entreprise VALUES (3, 'EA', 'États-Unis'); --EA est une entreprise 
 
 INSERT INTO Genre VALUES (1, 'RPG'); --Définition du genre RPG--
 INSERT INTO Genre VALUES (2, 'Course'); --Définition du genre Course--
+INSERT INTO Genre VALUES (3, 'Action'); --Définition du genre Action--
 
 INSERT INTO Jeu VALUES (1, 'Cyberpunk 2077', 69.99, '2020-12-10', 18, 1, 1, 'Cyberpunk 2077 est un JDR d''action-aventure en monde ouvert, qui se déroule à Night City, une mégalopole futuriste et sombre, obsédée par le pouvoir, la séduction et les modifications corporelles.', '/images/cyberpunk2077.jpg'); --CD Projekt Red est le développeur et l'éditeur du jeu en même temps--
 INSERT INTO Jeu VALUES (2, 'Need for speed Unbound', 39.99, '2022-11-29', 12, 2, 3, 'Pour atteindre le sommet, pas le droit à l’erreur ! Défiez la police et participez aux qualifications pour participer au Grand, la course de rue ultime. Sublimez votre garage avec des voitures ultra personalisées, et brillez grâce à votre style unique.', '/images/nfs_unbound.jpg'); --Criterion est le développeur et EA est l'éditeur du jeu --
@@ -226,3 +248,4 @@ INSERT INTO JoueurSucces VALUES (1, 2, '2022-12-01'); --Yacine a obtenu le succ�
 
 INSERT INTO JeuGenre VALUES (1, 1); --Cyberpunk 2077 est un RPG--
 INSERT INTO JeuGenre VALUES (2, 2); --NFS Unbound est un jeu de course--
+INSERT INTO JeuGenre VALUES (1, 3); --Cyberpunk 2077 est un jeu d'action--
