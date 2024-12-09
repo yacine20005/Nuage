@@ -34,20 +34,28 @@
     </header>
     <main>
       <h1 style="text-align: center">Connexion</h1>
-        <form action="{{ url_for('connexion') }}" method="POST">
-            <input
-            type="text"
-            name="user"
-            placeholder="Nom d'utilisateur ou adresse mail"
-            required
+        <form class="inscription" action="{{ url_for('connexion') }}" method="POST">
+          <div>  
+          
+          <input
+              class="inscription"
+              type="text"
+              name="user"
+              placeholder="Nom d'utilisateur ou adresse mail"
+              required
             />
             <input
-            type="password"
-            name="password"
-            placeholder="Mot de passe"
-            required
+              class="inscription"
+              type="password"
+              name="password"
+              placeholder="Mot de passe"
+              required
             />
-            <button type="submit">Se connecter</button>
+            
+            <div style="display: flex; justify-content: center;">
+                <button type="submit"> Se connecter </button>
+            </div>
+          </div>
     </main>
 
     <footer>

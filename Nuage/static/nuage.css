@@ -4,6 +4,7 @@
   --text-color: #ffffff;
   --secondary-color: #1c1c1c;
   --accent-color: #950101;
+  --hover-color: #3d0000;
 }
 
 body {
@@ -52,9 +53,19 @@ form {
 input {
   width: 400px;
   padding: 10px;
-  background-color: #1c1c1c;
+  background-color: var(--primary-color);
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;;
+  font-size: 16px;
+  color: white;
+}
+
+select {
+  padding: 10px;
+  background-color: var(--primary-color);
   border: 1px solid #ccc;
   border-radius: 4px 0 0 4px;
+  border-left: none;
   font-size: 16px;
   color: white;
 }
@@ -62,16 +73,15 @@ input {
 button[type="submit"] {
   padding: 10px 20px;
   border: 2px solid #ccc;
-  border-left: none;
-  border-radius: 0 4px 4px 0;
-  background-color: #950101;
+  border-radius: 4px 4px 4px 4px;
+  background-color: var(--accent-color);
   color: white;
   font-size: 16px;
   cursor: pointer;
 }
 
 button[type="submit"]:hover {
-  background-color: #3d0000;
+  background-color: var(--hover-color);
 }
 
 footer {
@@ -129,7 +139,18 @@ footer {
   font-size: 0.9rem;
 }
 .btn:hover {
-  background-color: #3d0000;
+  background-color: var(--hover-color);
+}
+
+.recherche button[type="submit"] {
+  padding: 10px 20px;
+  border: 2px solid #ccc;
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+  background-color: var(--accent-color);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
 }
 
 .centered-div {
@@ -178,13 +199,19 @@ footer {
   padding: 1rem;
 }
 
+.inscription {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
 form .inscription input {
   width: 100%;
   padding: 10px;
-  background-color: #1c1c1c;
+  background-color: var(--secondary-color);
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 16px;
   color: white;
-  margin-bottom: 10px; /* Add space between inputs */
+  margin-bottom: 10px;
 }

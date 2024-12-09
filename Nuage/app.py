@@ -17,9 +17,26 @@ def boutique():
     conn.close()
     return flask.render_template("boutique.html", h = h, m = m, s = s, jeux = jeux)
 
-@app.route("/recherche")
+@app.route('/recherche', methods=['GET'])
 def recherche():
-    return flask.render_template("recherche.html")
+    query = flask.request.args.get('recherche')
+    query = query.lower()
+    type_recherche = flask.request.args.get('type-recherche')
+    resultats = []
+    conn = db.connect()
+    cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
+    cur.execute("SELECT * FROM Boutique WHERE %s LIKE %s", (type_recherche, '%' + query + '%'))
+    resultats = cur.fetchall()
+    cur.close()
+    conn.close()
+    print(resultats)
+    return flask.render_template("recherche.html", resultats=resultats)
+
+
+
+@app.route("/profil")
+def profil():
+    return flask.render_template("profil.html")
 
 @app.route("/connexion")
 def connexion():

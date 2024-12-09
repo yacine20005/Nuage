@@ -35,47 +35,51 @@
     <main>
       <h1 style="text-align: center">Inscription</h1>
         <form class="inscription" action="{{ url_for('inscription') }}" method="POST">
-            
-            <input
-            class = "inscription"
-            type="text"
-            name="non"
-            placeholder="Nom"
-            required
-            />
-            
-            <input
-            class = "inscription"
-            type="email"
-            name="email"
-            placeholder="Adresse mail"
-            required
-            />
+            <div>
+              <input
+              class = "inscription"
+              type="text"
+              name="non"
+              placeholder="Nom"
+              required
+              />
+              
+              <input
+              class = "inscription"
+              type="email"
+              name="email"
+              placeholder="Adresse mail"
+              required
+              />
 
-            <input
-            class = "inscription"
-            type="text"
-            name="user"
-            placeholder="Nom d'utilisateur"
-            required
-            />
+              <input
+              class = "inscription"
+              type="text"
+              name="user"
+              placeholder="Nom d'utilisateur"
+              required
+              />
 
-            <input
-            type="password"
-            name="password"
-            placeholder="Mot de passe"
-            required
-            />
+              <input
+              type="password"
+              name="password"
+              placeholder="Mot de passe"
+              required
+              />
 
-            <input
-            class = "inscription"
-            type="date"
-            name="date_de_naissance"
-            placeholder="Date de naissance"
-            required
-            />
+              <input
+              class = "inscription"
+              type="date"
+              name="date_de_naissance"
+              placeholder="Date de naissance"
+              required
+              />
+      
+            <div style="display: flex; justify-content: center;">
+              <button type="submit" class="inscription">Rejoindre le nuage</button>
+            </div>
 
-            <button type="submit">Rejoindre le nuage</button>
+          </div>
     </main>
 
     <footer>
