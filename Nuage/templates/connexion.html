@@ -27,7 +27,7 @@
           <li><a href="{{ url_for('boutique') }}">Boutique</a></li>
           <li><a href="{{ url_for('recherche') }}">Recherche</a></li>
           {% if session.get('user_id') %}
-          <li><a href="#">Profil</a></li>
+          <li><a href="{{ url_for('profil') }}">Profil</a></li>
           <li><a href="{{ url_for('deconnexion') }}">Déconnexion</a></li>
           {% else %}
           <li><a href="{{ url_for('connexion') }}">Connexion</a></li>
@@ -54,6 +54,12 @@
               placeholder="Mot de passe"
               required
             />
+
+            {% if etat == 1 %}
+            <p style="color: red; text-align: center;">Nom d'utilisateur ou email incorrect.</p>
+            {% elif etat == 2 %}
+            <p style="color: red; text-align: center;">Mot de passe incorrect.</p>
+            {% endif %}
             
             <div style="display: flex; justify-content: center;">
                 <button type="submit"> Se connecter </button>

@@ -27,7 +27,7 @@
           <li><a href="{{ url_for('boutique') }}">Boutique</a></li>
           <li><a href="{{ url_for('recherche') }}">Recherche</a></li>
           {% if session.get('user_id') %}
-          <li><a href="#">Profil</a></li>
+          <li><a href="{{ url_for('profil') }}">Profil</a></li>
           <li><a href="{{ url_for('deconnexion') }}">Déconnexion</a></li>
           {% else %}
           <li><a href="{{ url_for('connexion') }}">Connexion</a></li>
@@ -43,7 +43,7 @@
               <input
               class = "inscription"
               type="text"
-              name="non"
+              name="nom"
               placeholder="Nom"
               required
               />
@@ -78,6 +78,15 @@
               placeholder="Date de naissance"
               required
               />
+
+              {% if etat == 1 %}
+              <p style="color: red; text-align: center;">L'email est déjà utilisé.</p>
+              {% elif etat == 2 %}
+                <p style="color: red; text-align: center;">Le pseudo est déjà utilisé ou trop long (maximum 20 caractères).</p>
+              {% elif etat == 3 %}
+                <p style="color: red; text-align: center;">Le mot de passe doit comporter au moins 8 caractères.</p>
+              {% endif %}
+      
       
             <div style="display: flex; justify-content: center;">
               <button type="submit" class="inscription">Rejoindre le nuage</button>

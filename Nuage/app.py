@@ -6,7 +6,6 @@ password_ctx = CryptContext(schemes=["bcrypt"])
 session = {}
 
 app = flask.Flask(__name__)
-app.secret_key = 'WeekendAvecPrisci'  # Remplace par une vraie clé secrète
 
 @app.context_processor
 def inject_session():
@@ -30,9 +29,8 @@ def recherche():
     resultats = []
     query = flask.request.args.get('recherche')
     if(query):
-        query = query.lower()
         type_recherche = flask.request.args.get('type-recherche')
-        if(type_recherche in ["titre", "genres", "developeur", "editeur"]):
+        if(type_recherche in ["titre", "genres", "developpeur", "editeur"]):
             conn = db.connect()
             cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
              
@@ -50,44 +48,18 @@ def recherche():
 def profil():
     return flask.render_template("profil.html")
 
-@app.route("/connexion2", methods=["GET", "POST"])
-def connexion2():
-    conn = db.connect()
-    cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
-    etat = 1 #0 si rien, 1 si pseudo/mail faux, 2 si mdp faux !
-    user = flask.request.form.get('user')
-    password = flask.request.form.get('password')
-    if user and password : 
-        if '@' in user:
-            cur.execute("SELECT idJoueur FROM Joueur WHERE emial = %s;", (user,))
-        else:
-            cur.execute("SELECT idJoueur FROM Joueur WHERE pseudo = %s;", (user,)) 
-        user_id = cur.fetchone()
-        user_id = user_id[0] if user_id else None
-        if(user_id):
-            etat = 2
-            #tu prend son mdp et tu le compare avec le hash de celui qu'il as mis
-            cur.execute("SELECT mot_de_passe FROM Joueur WHERE idjoueur = %s;", (user_id,))
-            user_hash = cur.fetchone()
-            user_hash = user_hash[0] if user_hash else None
-            if user_hash and password_ctx.verify(password, user_hash):  #et si tout est bon il est connecté
-                session['user_id'] = user_id
-                etat = 0
-    cur.close()
-    conn.close()
-    return flask.render_template("connexion.html", etat = etat)
-
 
 @app.route("/connexion", methods=["GET", "POST"])
 def connexion():
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
-    etat = 1 #0 si rien, 1 si pseudo/mail faux, 2 si mdp faux !
+    etat = 0 #0 si rien, 1 si pseudo/mail faux, 2 si mdp faux, 3 si connexion reussie!
     user = flask.request.form.get('user')
     password = flask.request.form.get('password')
     if user and password : 
+        etat = 1
         if '@' in user:
-            cur.execute("SELECT idJoueur FROM Joueur WHERE emial = %s;", (user,))
+            cur.execute("SELECT idJoueur FROM Joueur WHERE email = %s;", (user,))
         else:
             cur.execute("SELECT idJoueur FROM Joueur WHERE pseudo = %s;", (user,)) 
         user_id = cur.fetchone()
@@ -102,11 +74,10 @@ def connexion():
             if user_hash == password:  #et si tout est bon il est connecté
             #if user_hash and password_ctx.verify(password, user_hash):  #verification a rajoute pour prendre en compte les hash
                 session['user_id'] = user_id
-                etat = 0
-    print(etat)
+                etat = 3
     cur.close()
     conn.close()
-    if(etat):
+    if(etat != 3):
         return flask.render_template("connexion.html", etat = etat)
     else:
         return flask.redirect(flask.url_for('boutique'))
@@ -119,9 +90,38 @@ def deconnexion():
     return flask.redirect(flask.url_for('boutique'))  # Redirige vers la boutique
 
 
-@app.route("/inscription")
+@app.route("/inscription", methods=["GET", "POST"])
 def inscription():
-    return flask.render_template("inscription.html")
+
+    etat = 0  # 0 = pas d'erreur, 1 = email déjà utilisé, 2 = pseudo déjà utilisé ou trop long, 3 = mot de passe trop court
+    conn = db.connect()
+    cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
+    nom = flask.request.form.get('nom')
+    email = flask.request.form.get('email')
+    user = flask.request.form.get('user')
+    password = flask.request.form.get('password')
+    datenaissance = flask.request.form.get('date_de_naissance')
+    if(nom and email and user and password and datenaissance):
+        if '@' in email and  '.' in email:
+            cur.execute("SELECT idJoueur FROM Joueur WHERE email = %s;", (email,))
+            if(cur.fetchone()):
+                etat = 1
+                return flask.render_template("inscription.html", etat = etat) 
+            cur.execute("SELECT idJoueur FROM Joueur WHERE pseudo = %s;", (user,))
+            if(cur.fetchone() or len(user) < 3 or len(user) > 16):
+                etat = 2
+                return flask.render_template("inscription.html", etat = etat) 
+            if(len(password) < 8):
+                etat = 3
+                return flask.render_template("inscription.html", etat = etat) 
+            if etat == 0:
+                hash_pw = password_ctx.hash(password) #Calcul du hash du mot de passe à stocker
+                cur.execute("INSERT INTO Joueur (pseudo, email, mot_de_passe, nom, date_naissance, solde) VALUES (%s, %s, %s, %s, %s, 0);", (user, email, hash_pw, nom, datenaissance))
+            cur.close()
+            conn.close()
+        if etat == 0:
+            return flask.redirect(flask.url_for('connexion')) 
+    return flask.render_template("inscription.html", etat = etat) 
 
 @app.route("/jeu/<int:id>")
 def jeu(id):
