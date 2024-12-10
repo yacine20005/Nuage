@@ -26,9 +26,13 @@
         <ul>
           <li><a href="{{ url_for('boutique') }}">Boutique</a></li>
           <li><a href="{{ url_for('recherche') }}">Recherche</a></li>
+          {% if session.get('user_id') %}
           <li><a href="#">Profil</a></li>
+          <li><a href="{{ url_for('deconnexion') }}">Déconnexion</a></li>
+          {% else %}
           <li><a href="{{ url_for('connexion') }}">Connexion</a></li>
           <li><a href="{{ url_for('inscription') }}">inscription</a></li>
+          {% endif %}
         </ul>
       </nav>
     </header>
@@ -36,7 +40,6 @@
       <h1 style="text-align: center">Connexion</h1>
         <form class="inscription" action="{{ url_for('connexion') }}" method="POST">
           <div>  
-          
           <input
               class="inscription"
               type="text"
@@ -54,6 +57,7 @@
             
             <div style="display: flex; justify-content: center;">
                 <button type="submit"> Se connecter </button>
+            </form>
             </div>
           </div>
     </main>
