@@ -55,10 +55,10 @@
         </form>
       </div>
 
-      {% if results %}
+      {% if resultats %}
       <h2>Résultats de la recherche :</h2>
       <div class="game-list">
-        {% for jeu in results %}
+        {% for jeu in resultats %}
         <div class="game-card">
           <img
             src="{{ url_for('static', filename=jeu.image_path) }}"

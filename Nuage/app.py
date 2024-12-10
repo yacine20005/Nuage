@@ -1,6 +1,7 @@
 import time
 import flask
 import db
+from psycopg2 import sql
 
 app = flask.Flask(__name__)
 
@@ -19,17 +20,21 @@ def boutique():
 
 @app.route('/recherche', methods=['GET'])
 def recherche():
-    query = flask.request.args.get('recherche')
-    query = query.lower()
-    type_recherche = flask.request.args.get('type-recherche')
     resultats = []
-    conn = db.connect()
-    cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
-    cur.execute("SELECT * FROM Boutique WHERE %s LIKE %s", (type_recherche, '%' + query + '%'))
-    resultats = cur.fetchall()
-    cur.close()
-    conn.close()
-    print(resultats)
+    query = flask.request.args.get('recherche')
+    if(query):
+        query = query.lower()
+        type_recherche = flask.request.args.get('type-recherche')
+        if(type_recherche in ["titre", "genres", "developeur", "editeur"]):
+            conn = db.connect()
+            cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
+             
+            cur.execute(f"SELECT * FROM Boutique WHERE {type_recherche} ILIKE %s", ('%' + query + '%',))
+
+            resultats = cur.fetchall()
+            cur.close()
+            conn.close()
+            print(resultats)
     return flask.render_template("recherche.html", resultats=resultats)
 
 
