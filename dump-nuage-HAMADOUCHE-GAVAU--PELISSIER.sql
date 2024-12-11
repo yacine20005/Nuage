@@ -14,6 +14,10 @@ DROP TABLE IF EXISTS JoueurSucces CASCADE;
 DROP TABLE IF EXISTS JeuGenre CASCADE;
 DROP VIEW IF EXISTS RapportVentes;
 DROP VIEW IF EXISTS Boutique;
+DROP VIEW IF EXISTS JoueurPossede;
+DROP VIEW IF EXISTS JoueurPartage;
+DROP VIEW IF EXISTS CommentaireJeu;
+DROP VIEW IF EXISTS TauxCompletion;
 
 ---<Tables>---
 
@@ -107,7 +111,6 @@ CREATE TABLE Partage (
     FOREIGN KEY (idJoueur1) REFERENCES Joueur(idJoueur),
     FOREIGN KEY (idJoueur2) REFERENCES Joueur(idJoueur),
     FOREIGN KEY (idJeu) REFERENCES Jeu(idJeu),
-    CONSTRAINT check_doublon_partage CHECK (idJoueur1 < idJoueur2), --On vérifie que l'idJoueur1 est plus petit que l'idJoueur2 pour éviter les doublons éventuelles--
     CONSTRAINT check_same_joueur_partage CHECK (idJoueur1 != idJoueur2), --On vérifie que l'idJoueur1 est différent de l'idJoueur2 parce qu'on ne peut pas partager un jeu avec soi-même...--
     CONSTRAINT unique_partage UNIQUE (idJoueur1, idJeu) --On vérifie que le joueur 1 n'a pas déjà partagé ce jeu--
     --CONSTRAINT check_amitie_partage CHECK ((idJoueur1, idJoueur2) IN (SELECT idJoueur1, idJoueur2 FROM Amitie)), --On vérifie que les joueurs sont bien amis pour partager un jeu--
@@ -190,6 +193,27 @@ CREATE VIEW Boutique AS
         j.idJeu, j.titre, j.prix, j.date_de_sortie, j.pegi, j.idDeveloppeur, j.idEditeur, j.description_Jeu, j.image_path, d.nomEntreprise, ed.nomEntreprise
 );
 
+CREATE VIEW JoueurPossede AS
+(
+    SELECT
+    jj.idJoueur AS idJoueur,
+    j.*
+    FROM
+    JoueurJeu AS jj
+    JOIN Jeu AS j ON jj.idJeu = j.idJeu
+);
+
+CREATE VIEW JoueurPartage AS
+(
+    SELECT
+    j.*,
+    p.idJoueur1 AS idJoueurPartageur,
+    p.idJoueur2 AS idJoueurReceveur
+    FROM
+    Jeu AS j
+    JOIN Partage AS p ON j.idJeu = p.idJeu
+);
+
 CREATE VIEW CommentaireJeu AS
 (
     SELECT 
@@ -211,7 +235,42 @@ CREATE VIEW CommentaireJeu AS
         JOIN Joueur AS jo ON c.idJoueur = jo.idJoueur
 );
 
+CREATE VIEW JoueurAmis AS
+(
+    SELECT 
+        j1.idJoueur AS idJoueur1,
+        j2.idJoueur AS idJoueur2,
+        j1.pseudo AS pseudo1,
+        j2.pseudo AS pseudo2
+    FROM 
+        Joueur AS j1
+        JOIN Amitie AS a ON j1.idJoueur = a.idJoueur1
+        JOIN Joueur AS j2 ON a.idJoueur2 = j2.idJoueur
+    UNION
+    SELECT 
+        j2.idJoueur AS idJoueur1,
+        j1.idJoueur AS idJoueur2,
+        j2.pseudo AS pseudo1,
+        j1.pseudo AS pseudo2
+    FROM 
+        Joueur AS j1
+        JOIN Amitie AS a ON j1.idJoueur = a.idJoueur1
+        JOIN Joueur AS j2 ON a.idJoueur2 = j2.idJoueur
+);
 
+CREATE VIEW TauxCompletion AS
+SELECT 
+    jj.idJoueur,
+    jj.idJeu,
+    COUNT(js.idSucces) AS succes_debloques,
+    COUNT(s.idSucces) AS succes_total,
+    (COUNT(js.idSucces)::float / COUNT(s.idSucces)::float) * 100 AS taux_completion
+FROM 
+    JoueurJeu jj
+    JOIN Succes s ON jj.idJeu = s.idJeu
+    LEFT JOIN JoueurSucces js ON js.idJoueur = jj.idJoueur AND js.idSucces = s.idSucces
+GROUP BY 
+    jj.idJoueur, jj.idJeu;
 
 ---<Insertions>---
 
@@ -223,6 +282,7 @@ INSERT INTO Entreprise VALUES (2, 'Criterion', 'Royaume-Uni'); --Criterion est u
 INSERT INTO Entreprise VALUES (3, 'EA', 'États-Unis'); --EA est une entreprise américaine--
 INSERT INTO Entreprise VALUES (4, 'Rocksteady Studios', 'Royaume-Uni'); --Rocksteady est une entreprise britannique--
 INSERT INTO Entreprise VALUES (5, 'Warner Bros Games', 'États-Unis'); --Warner Bros est une entreprise americaine--
+INSERT INTO Entreprise VALUES (6, 'Kunos Simulazioni', 'Italie'); --Kunos Simulazioni est une entreprise italienne--
 
 INSERT INTO Genre VALUES (1, 'RPG'); --Définition du genre RPG--
 INSERT INTO Genre VALUES (2, 'Course'); --Définition du genre Course--
@@ -230,34 +290,46 @@ INSERT INTO Genre VALUES (3, 'Action'); --Définition du genre Action--
 
 INSERT INTO Jeu VALUES (1, 'Cyberpunk 2077', 69.99, '2020-12-10', 18, 1, 1, 'Cyberpunk 2077 est un JDR d''action-aventure en monde ouvert, qui se déroule à Night City, une mégalopole futuriste et sombre, obsédée par le pouvoir, la séduction et les modifications corporelles.', '/images/cyberpunk2077.jpg'); --CD Projekt Red est le développeur et l'éditeur du jeu en même temps--
 INSERT INTO Jeu VALUES (2, 'Need for speed Unbound', 39.99, '2022-11-29', 12, 2, 3, 'Pour atteindre le sommet, pas le droit à l’erreur ! Défiez la police et participez aux qualifications pour participer au Grand, la course de rue ultime. Sublimez votre garage avec des voitures ultra personalisées, et brillez grâce à votre style unique.', '/images/nfs_unbound.jpg'); --Criterion est le développeur et EA est l'éditeur du jeu --
-INSERT INTO Jeu VALUES (3, 'Batman Arkham Knight', 59.99, '2015-06-23', 18, 4, 5, 'Enfilez le masque alors que le Chevalier noir s''aventure dans l''ultime chapitre de la trilogie Arkham par Rocksteady. Les joueurs incarneront le plus grand détective du monde comme jamais auparavant grâce à l''arrivée de la Batmobile et aux améliorations apportées à des éléments clés des précédents opus : le combat déchaîné, la furtivité, le scanner médico-légal et la navigation.', '/images/batman.jpg');
+INSERT INTO Jeu VALUES (3, 'Batman Arkham Knight', 59.99, '2015-06-23', 18, 4, 5, 'Enfilez le masque alors que le Chevalier noir s''aventure dans l''ultime chapitre de la trilogie Arkham par Rocksteady. Les joueurs incarneront le plus grand détective du monde comme jamais auparavant grâce à l''arrivée de la Batmobile et aux améliorations apportées à des éléments clés des précédents opus : le combat déchaîné, la furtivité, le scanner médico-légal et la navigation.', '/images/batman.jpg'); --Rocksteady est le développeur et Warner Bros est l'éditeur du jeu--
+INSERT INTO Jeu VALUEs (4, 'Assetto Corsa Competizione', 39.99, '2019-05-29', 3, 6, 6, 'Assetto Corsa Competizione est le nouveau jeu vidéo officiel de la série Blancpain GT Series. Grâce à la qualité exceptionnelle de la simulation, vous pourrez vivre l''atmosphère de la GT3, et affronter des pilotes, des équipes, des voitures et des circuits officiels.', '/images/assetto_corsa.jpg'); --Kunos Simulazioni est le développeur et l'éditeur du jeu--
+
+INSERT INTO JeuGenre VALUES (1, 1); --Cyberpunk 2077 est un RPG--
+INSERT INTO JeuGenre VALUES (2, 2); --NFS Unbound est un jeu de course--
+INSERT INTO JeuGenre VALUES (1, 3); --Cyberpunk 2077 est un jeu d'action--
+INSERT INTO JeuGenre VALUES (3, 3); --Batman est un jeu d'action--
+INSERT INTO JeuGenre VALUES (4, 2); --Assetto Corsa est un jeu de course--
 
 INSERT INTO Succes VALUES (1, 1, 'Braquage Konpeki Plaza', 'Vous avez eu ce que vous vouliez mais à quel prix ?'); --Succès du jeu Cyberpunk 2077--
 INSERT INTO Succes VALUES (2, 2, 'Insaisissable', 'Échappez à une poursuite policière en Alerte 5 au volant d’une voiture A+'); --Succès du jeu NFS Unbound--
 INSERT INTO Succes VALUES (3, 2, 'Le roi de la route', 'Remportez toutes les courses de rue'); --Succès du jeu NFS Unbound--
 INSERT INTO Succes VALUES (4, 2, 'Le roi du drift', 'Remportez toutes les courses de drift'); --Succès du jeu NFS Unbound--
 INSERT INTO Succes VALUES (5, 2, 'Le roi de la déliquence', 'Echappez à 10 poursuites policières'); --Succès du NFS Unbound--
+INSERT INTO Succes VALUES (6, 3, 'Le chevalier noir', 'Terminez le jeu en difficulté Chevalier Noir'); --Succès du jeu Batman--
+INSERT INTO Succes VALUES (7, 4, 'Le roi de la piste', 'Remportez toutes les courses de la série Blancpain GT Series'); --Succès du jeu Assetto Corsa--
+INSERT INTO Succes VALUES (8, 4, 'Le roi de la nuit', 'Remportez une course de nuit'); --Succès du jeu Assetto Corsa--
+
+INSERT INTO JoueurSucces VALUES (1, 1, '2020-12-27'); --Yacine a obtenu le succès "Braquage Konpeki Plaza" le 27 décembre 2020--
+INSERT INTO JoueurSucces VALUES (1, 2, '2022-12-01'); --Yacine a obtenu le succès "Insaisissable" le 1er décembre 2022--
+INSERT INTO JoueurSucces VALUES (1, 4, '2022-12-01'); --Yacine a obtenu le succès "Le roi du drift" le 1er décembre 2022--
+
 
 INSERT INTO Commentaire VALUES (1, 17, 'J''ai versé une larme à la fin du jeu vraiment un banger vidéoludique', 1, 1); --Commentaire du joueur 1 sur le jeu 1--
 INSERT INTO Commentaire VALUES (2, 19, 'Le jeu est parfait, mais beaucoup trop de scènes obscènes', 1, 2); --Commentaire du joueur 2 sur le jeu 1--
 INSERT INTO Commentaire VALUES (3, 14, 'J''ai adoré le jeu mais les voitures sont très désequilibrés en multijoueur...', 2, 1); --Commentaire du joueur 1 sur le jeu 2--
 INSERT INTO Commentaire VALUES (4, 18, 'Je me suis senti dans la peau du chevalier noir pendant toute la durée du jeu, je recommande vivement pour tous les fans de la licence.', 3, 2); --Commentaire du joueur 2 sur le jeu 3 --
+INSERT INTO Commentaire VALUES (5, 20, 'Le jeu est très réaliste, mais les graphismes sont un peu décevants...', 4, 1); --Commentaire du joueur 3 sur le jeu 1--
 
 INSERT INTO Transaction_user VALUES (1, 1, 1, 69.99, '2020-12-26', 'Achat du jeu Cyberpunk 2077'); --Transaction d'achat du jeu Cyberpunk 2077 par le joueur 1--
 INSERT INTO Transaction_user VALUES (2, 1, 2, 39.99, '2022-11-17', 'Précommande NFS Unbound'); --Transaction de précommande du jeu NFS Unbound par le joueur 1--
 INSERT INTO Transaction_user VALUES (3, 2, 3, 59.99, '2024-12-11', 'Achat du jeu Batman Arkham Knight'); --Transaction d'achat du jeu Batman par le joueur 2--
+INSERT INTO Transaction_user VALUES (4, 1, 4, 39.99, '2022-12-01', 'Achat du jeu Assetto Corsa Competizione'); --Transaction d'achat du jeu Assetto Corsa par le joueur 1--
+
+INSERT INTO JoueurJeu VALUES (1, 1, '2020-12-26'); --Yacine a acheté Cyberpunk 2077 le 26 décembre 2020--
+INSERT INTO JoueurJeu VALUES (1, 2, '2022-11-17'); --Yacine a acheté NFS Unbound le 17 novembre 2022--
+INSERT INTO JoueurJeu VALUES (2, 3, '2024-12-11'); --Liam a acheté Batman le 11 décembre 2024--
+INSERT INTO JoueurJeu VALUES (1, 4, '2022-12-01'); --Yacine a acheté Assetto Corsa le 1er décembre 2022--
 
 INSERT INTO Amitie VALUES (1, 2); --Yacine et Liam sont amis--
 
 INSERT INTO Partage VALUES (1, 2, 1); --Yacine a partager avec Liam une expérience vidéoludique sans précédent (Cyberpunk 2077)--
-
-INSERT INTO JoueurJeu VALUES (1, 1, '2020-12-26'); --Yacine a acheté Cyberpunk 2077 le 26 décembre 2020--
-INSERT INTO JoueurJeu VALUES (2, 3, '2024-12-11'); --Liam a acheté Batman le 11 décembre 2024--
-
-INSERT INTO JoueurSucces VALUES (1, 1, '2020-12-27'); --Yacine a obtenu le succès "Braquage Konpeki Plaza" le 27 décembre 2020--
-INSERT INTO JoueurSucces VALUES (1, 2, '2022-12-01'); --Yacine a obtenu le succès "Insaisissable" le 1er décembre 2022--
-
-INSERT INTO JeuGenre VALUES (1, 1); --Cyberpunk 2077 est un RPG--
-INSERT INTO JeuGenre VALUES (2, 2); --NFS Unbound est un jeu de course--
-INSERT INTO JeuGenre VALUES (1, 3); --Cyberpunk 2077 est un jeu d'action--
-INSERT INTO JeuGenre VALUES (3, 3); --Batman est un jeu d'action--
+INSERT INTO Partage VALUES (2, 1, 3); --Liam a partager avec Yacine Batman Arkham Knight--

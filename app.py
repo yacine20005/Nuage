@@ -1,4 +1,3 @@
-import time
 import flask
 import db_yacine as db # Importation du module db_yacine.py
 #import db_liam as db
@@ -12,18 +11,81 @@ app = flask.Flask(__name__)
 def inject_session():
     return dict(session=session) # Permet d'accéder à la session dans les templates
 
+@app.route("/")
+def home():
+    return flask.redirect(flask.url_for('boutique'))
+
 @app.route("/boutique")
 def boutique():
-    h = time.localtime().tm_hour
-    m = time.localtime().tm_min
-    s = time.localtime().tm_sec
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
     cur.execute('SELECT * FROM Boutique;')
     jeux = cur.fetchall()
+    print(jeux)
     cur.close()
     conn.close()
     return flask.render_template("boutique.html", jeux = jeux)
+
+@app.route("/profil")
+def profil():
+    conn = db.connect()
+    cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
+    
+    cur.execute("SELECT * FROM Joueur WHERE idJoueur = %s;", (session["user_id"],))
+    joueur = cur.fetchone()
+
+    cur.execute("SELECT * FROM JoueurPossede WHERE JoueurPossede.idJoueur = %s;", (session["user_id"],))
+    possede = cur.fetchall()
+    
+    cur.execute("SELECT * FROM JoueurPartage WHERE JoueurPartage.idJoueurReceveur = %s;", (session["user_id"],))
+    partage = cur.fetchall()
+    
+    cur.execute("SELECT * FROM CommentaireJeu WHERE Joueur = %s;", (session["user_id"],))
+    commentaires = cur.fetchall()
+    
+    cur.execute("SELECT DISTINCT * FROM JoueurAmis WHERE idJoueur1 = %s OR idJoueur2 = %s;", (session["user_id"], session["user_id"]))
+    amis = cur.fetchall()
+    
+    cur.execute("SELECT Jeu.idJeu, COUNT(Succes.idSucces) AS total_succes FROM Jeu LEFT JOIN Succes ON Jeu.idJeu = Succes.idJeu GROUP BY Jeu.idJeu;")
+    liste_jeux = cur.fetchall()
+    
+    taux_completion_jeux = {}
+    for jeu in liste_jeux:
+        cur.execute("SELECT COUNT(*) AS succes_debloques FROM JoueurSucces JOIN Succes ON JoueurSucces.idSucces = Succes.idSucces WHERE JoueurSucces.idJoueur = %s AND Succes.idJeu = %s", (session["user_id"], jeu.idjeu))
+        succes_debloques = cur.fetchone().succes_debloques
+        
+        if jeu.total_succes > 0:
+            taux_completion = (succes_debloques / jeu.total_succes) * 100
+        else:
+            taux_completion = 0
+            
+        taux_completion_jeux[jeu.idjeu] = taux_completion
+    
+    cur.close()
+    conn.close()
+    print(amis)
+    return flask.render_template("profil.html", possede=possede, partage=partage, commentaires=commentaires, joueur=joueur, taux_completion_jeux=taux_completion_jeux, amis=amis)
+
+@app.route("/jeu/<int:id>")
+def jeu(id):
+    conn = db.connect()
+    cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
+    
+    cur.execute("SELECT * FROM Boutique WHERE idjeu = %s;", (id,))  # Utilisation de paramètres préparés pour éviter l'injection SQL car psycopg2 se charge de gérer la valeur
+    jeux = cur.fetchall()
+        
+    cur.execute("SELECT * FROM CommentaireJeu WHERE idjeu = %s;", (id,))
+    commentaires = cur.fetchall()
+    
+    cur.close()
+    conn.close()
+    return flask.render_template("jeu.html", jeux=jeux, commentaires=commentaires)
+
+@app.route("/deconnexion")
+def deconnexion():
+    if 'user_id' in session:  # Vérifie si 'user_id' est présent dans la session
+        session.pop('user_id')  # Supprime 'user_id' de la session
+    return flask.redirect(flask.url_for('boutique'))  # Redirige vers la boutique
 
 @app.route('/recherche', methods=['GET'])
 def recherche():
@@ -40,26 +102,6 @@ def recherche():
             conn.close()
             print(resultats)
     return flask.render_template("recherche.html", resultats=resultats)
-
-
-
-@app.route("/profil")
-def profil():
-    conn = db.connect()
-    cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
-    
-    cur.execute("SELECT * FROM profil WHERE idJoueur = %s;", (session["user_id"],))
-    resultats = cur.fetchall()
-    
-    cur.execute("SELECT pseudo FROM profil WHERE idJoueur = %s;", (session["user_id"],))
-    pseudo = cur.fetchall()
-    pseudo = pseudo[0].pseudo # Permet de récupérer le pseudo de l'utilisateur sans le tuple
-    
-    cur.execute("SELECT * FROM commentairejeu WHERE Joueur = %s;", (session["user_id"],))
-    commentaires = cur.fetchall()
-    conn.close()
-    return flask.render_template("profil.html", resultats = resultats, pseudo = pseudo, commentaires = commentaires)
-
 
 @app.route("/connexion", methods=["GET", "POST"])
 def connexion():
@@ -94,11 +136,6 @@ def connexion():
         return flask.redirect(flask.url_for('boutique'))
         
 
-@app.route("/deconnexion")
-def deconnexion():
-    if 'user_id' in session:  # Vérifie si 'user_id' est présent dans la session
-        session.pop('user_id')  # Supprime 'user_id' de la session
-    return flask.redirect(flask.url_for('boutique'))  # Redirige vers la boutique
 
 
 @app.route("/inscription", methods=["GET", "POST"])
@@ -148,20 +185,6 @@ def inscription():
         
     return flask.render_template("inscription.html", etat = etat)
 
-@app.route("/jeu/<int:id>")
-def jeu(id):
-    conn = db.connect()
-    cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
-    
-    cur.execute("SELECT * FROM Boutique WHERE idjeu = %s;", (id,))  # Utilisation de paramètres préparés pour éviter l'injection SQL car psycopg2 se charge de gérer la valeur
-    jeux = cur.fetchall()
-        
-    cur.execute("SELECT * FROM CommentaireJeu WHERE idjeu = %s;", (id,))
-    commentaires = cur.fetchall()
-    
-    cur.close()
-    conn.close()
-    return flask.render_template("jeu.html", jeux=jeux, commentaires=commentaires)
 
 if __name__ == '__main__':
     app.run(debug=True)
