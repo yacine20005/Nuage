@@ -38,15 +38,32 @@
     </header>
     <main>
       <h1 style="text-align: center">Profil de {{ pseudo }}</h1>
-      <h3 style="text-align: center">Mes jeux</h2>
+      <h3 style="text-align: center">Mes jeux</h3>
       <div class="game-list">
-        {% for jeu in resultat %}
-          <div class="game-card">
-            <img src="{{ url_for('static', filename=jeu.image_path) }}" alt="{{ jeu.titre }}" /> 
-            <h3>{{ jeu.titre }}</h3>
-            <p>Taux de complétion : {{ jeu.taux_completion }}</p>
-          </div>
+        {% for jeu in resultats %}
+        <div class="game-card">
+          <img
+            src="{{ url_for('static', filename=jeu.image_path) }}"
+            alt="{{ jeu.titre }}"
+          />
+          <h3>{{ jeu.titre }}</h3>
+          <p>Taux de complétion : {{ jeu.taux_completion }}</p>
+        </div>
         {% endfor %}
+      </div>
+      <h3 style="text-align: center">Mes Commentaires</h3>
+      <div class="centered-div">
+        <div class="text-comm">
+          {% for commentaire in commentaires %}
+          <p class="text-comm-card">
+            <strong class="align-right">{{ commentaire.note }}/20</strong>
+            <br />
+            <strong>{{ commentaire.pseudo }}</strong> : {{
+            commentaire.textecommentaire }}
+          </p>
+          {% endfor %}
+        </div>
+      </div>
     </main>
 
     <footer>

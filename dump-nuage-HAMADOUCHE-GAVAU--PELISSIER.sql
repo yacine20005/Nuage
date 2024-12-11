@@ -211,38 +211,6 @@ CREATE VIEW CommentaireJeu AS
         JOIN Joueur AS jo ON c.idJoueur = jo.idJoueur
 );
 
-CREATE VIEW Profil AS
-(
-    SELECT 
-        jo.pseudo AS pseudo,
-        jo.idJoueur AS idJoueur,
-        j.idJeu,
-        j.titre,
-        j.prix,
-        j.date_de_sortie,
-        j.pegi,
-        j.idDeveloppeur,
-        j.idEditeur,
-        d.nomEntreprise AS developpeur,
-        ed.nomEntreprise AS editeur,
-        j.description_Jeu AS description,
-        j.image_path,
-        COALESCE(jj.idJoueur, p.idJoueur1) AS proprietaire,
-        p.idJoueur2 AS partage_avec,
-        ROUND((COUNT(js.idSucces) * 100.0 / NULLIF(COUNT(s.idSucces), 0)), 2) AS taux_completion
-    FROM 
-        Jeu AS j
-        LEFT JOIN JoueurJeu AS jj ON j.idJeu = jj.idJeu
-        LEFT JOIN Partage AS p ON j.idJeu = p.idJeu AND p.idJoueur2 = jj.idJoueur
-        LEFT JOIN Entreprise AS d ON j.idDeveloppeur = d.idEntreprise
-        LEFT JOIN Entreprise AS ed ON j.idEditeur = ed.idEntreprise
-        LEFT JOIN Succes AS s ON j.idJeu = s.idJeu
-        LEFT JOIN JoueurSucces AS js ON s.idSucces = js.idSucces AND js.idJoueur = COALESCE(jj.idJoueur, p.idJoueur2)
-        LEFT JOIN Joueur AS jo ON COALESCE(jj.idJoueur, p.idJoueur2) = jo.idJoueur
-    GROUP BY 
-        jo.pseudo, jo.idJoueur, j.idJeu, j.titre, j.prix, j.date_de_sortie, j.pegi, j.idDeveloppeur, j.idEditeur, j.description_Jeu, j.image_path, d.nomEntreprise, ed.nomEntreprise, jj.idJoueur, p.idJoueur1, p.idJoueur2
-);
-
 
 
 ---<Insertions>---

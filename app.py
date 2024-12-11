@@ -47,13 +47,18 @@ def recherche():
 def profil():
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
+    
     cur.execute("SELECT * FROM profil WHERE idJoueur = %s;", (session["user_id"],))
-    resultat = cur.fetchall()
+    resultats = cur.fetchall()
+    
     cur.execute("SELECT pseudo FROM profil WHERE idJoueur = %s;", (session["user_id"],))
     pseudo = cur.fetchall()
     pseudo = pseudo[0].pseudo # Permet de récupérer le pseudo de l'utilisateur sans le tuple
+    
+    cur.execute("SELECT * FROM commentairejeu WHERE Joueur = %s;", (session["user_id"],))
+    commentaires = cur.fetchall()
     conn.close()
-    return flask.render_template("profil.html", resultat = resultat, pseudo = pseudo)
+    return flask.render_template("profil.html", resultats = resultats, pseudo = pseudo, commentaires = commentaires)
 
 
 @app.route("/connexion", methods=["GET", "POST"])
