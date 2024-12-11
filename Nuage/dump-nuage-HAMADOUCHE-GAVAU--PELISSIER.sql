@@ -213,12 +213,14 @@ CREATE VIEW CommentaireJeu AS
 
 ---<Insertions>---
 
-INSERT INTO Joueur VALUES (1, 'yacine20005', 'ScoobyHonda', 'Yacine', 'ya.hamadouche@gmail.com', '2005-12-24', 55.00); --Joueur 1--
+INSERT INTO Joueur VALUES (1, 'yacine20005', 'PasDeWeekendAvecPrisci', 'Yacine', 'ya.hamadouche@gmail.com', '2005-12-24', 55.00); --Joueur 1--
 INSERT INTO Joueur VALUES (2, 'SkY', 'Gael_ma_crush_92i', 'Liam', 'liam@outlook.com', '2005-12-16', 2546.00); --Joueur 2-- --Liam est riche grâce au CROUS--
 
 INSERT INTO Entreprise VALUES (1, 'CD Projekt Red', 'Pologne'); --CD Projekt Red est une entreprise polonaise--
 INSERT INTO Entreprise VALUES (2, 'Criterion', 'Royaume-Uni'); --Criterion est une entreprise britannique--
 INSERT INTO Entreprise VALUES (3, 'EA', 'États-Unis'); --EA est une entreprise américaine--
+INSERT INTO Entreprise VALUES (4, 'Rocksteady Studios', 'Royaume-Uni'); --Rocksteady est une entreprise britannique--
+INSERT INTO Entreprise VALUES (5, 'Warner Bros Games', 'États-Unis'); --Warner Bros est une entreprise americaine--
 
 INSERT INTO Genre VALUES (1, 'RPG'); --Définition du genre RPG--
 INSERT INTO Genre VALUES (2, 'Course'); --Définition du genre Course--
@@ -226,6 +228,7 @@ INSERT INTO Genre VALUES (3, 'Action'); --Définition du genre Action--
 
 INSERT INTO Jeu VALUES (1, 'Cyberpunk 2077', 69.99, '2020-12-10', 18, 1, 1, 'Cyberpunk 2077 est un JDR d''action-aventure en monde ouvert, qui se déroule à Night City, une mégalopole futuriste et sombre, obsédée par le pouvoir, la séduction et les modifications corporelles.', '/images/cyberpunk2077.jpg'); --CD Projekt Red est le développeur et l'éditeur du jeu en même temps--
 INSERT INTO Jeu VALUES (2, 'Need for speed Unbound', 39.99, '2022-11-29', 12, 2, 3, 'Pour atteindre le sommet, pas le droit à l’erreur ! Défiez la police et participez aux qualifications pour participer au Grand, la course de rue ultime. Sublimez votre garage avec des voitures ultra personalisées, et brillez grâce à votre style unique.', '/images/nfs_unbound.jpg'); --Criterion est le développeur et EA est l'éditeur du jeu --
+INSERT INTO Jeu VALUES (3, 'Batman Arkham Knight', 59.99, '2015-06-23', 18, 4, 5, 'Enfilez le masque alors que le Chevalier noir s''aventure dans l''ultime chapitre de la trilogie Arkham par Rocksteady. Les joueurs incarneront le plus grand détective du monde comme jamais auparavant grâce à l''arrivée de la Batmobile et aux améliorations apportées à des éléments clés des précédents opus : le combat déchaîné, la furtivité, le scanner médico-légal et la navigation.', '/images/batman.jpg');
 
 INSERT INTO Succes VALUES (1, 1, 'Braquage Konpeki Plaza', 'Vous avez eu ce que vous vouliez mais à quel prix ?'); --Succès du jeu Cyberpunk 2077--
 INSERT INTO Succes VALUES (2, 2, 'Insaisissable', 'Échappez à une poursuite policière en Alerte 5 au volant d’une voiture A+'); --Succès du jeu NFS Unbound--
@@ -233,15 +236,18 @@ INSERT INTO Succes VALUES (2, 2, 'Insaisissable', 'Échappez à une poursuite po
 INSERT INTO Commentaire VALUES (1, 17, 'J''ai versé une larme à la fin du jeu vraiment un banger vidéoludique', 1, 1); --Commentaire du joueur 1 sur le jeu 1--
 INSERT INTO Commentaire VALUES (2, 19, 'Le jeu est parfait, mais beaucoup trop de scènes obscènes', 1, 2); --Commentaire du joueur 2 sur le jeu 1--
 INSERT INTO Commentaire VALUES (3, 14, 'J''ai adoré le jeu mais les voitures sont très désequilibrés en multijoueur...', 2, 1); --Commentaire du joueur 1 sur le jeu 2--
+INSERT INTO Commentaire VALUES (4, 18, 'Je me suis senti dans la peau du chevalier noir pendant toute la durée du jeu, je reccomande vivement pour tous les fans de la licence.', 3, 2); --Commentaire du joueur 2 sur le jeu 3 --
 
 INSERT INTO Transaction_user VALUES (1, 1, 1, 69.99, '2020-12-26', 'Achat du jeu Cyberpunk 2077'); --Transaction d'achat du jeu Cyberpunk 2077 par le joueur 1--
 INSERT INTO Transaction_user VALUES (2, 1, 2, 39.99, '2022-11-17', 'Précommande NFS Unbound'); --Transaction de précommande du jeu NFS Unbound par le joueur 1--
+INSERT INTO Transaction_user VALUES (3, 2, 3, 59.99, '2024-12-11', 'Achat du jeu Batman Arkham Knight'); --Transaction d'achat du jeu Batman par le joueur 2--
 
 INSERT INTO Amitie VALUES (1, 2); --Yacine et Liam sont amis--
 
 INSERT INTO Partage VALUES (1, 2, 1); --Yacine a partager avec Liam une expérience vidéoludique sans précédent (Cyberpunk 2077)--
 
 INSERT INTO JoueurJeu VALUES (1, 1, '2020-12-26'); --Yacine a acheté Cyberpunk 2077 le 26 décembre 2020--
+INSERT INTO JoueurJeu VALUES (2, 3, '2024-12-11'); --Liam a acheté Batman le 11 décembre 2024--
 
 INSERT INTO JoueurSucces VALUES (1, 1, '2020-12-27'); --Yacine a obtenu le succès "Braquage Konpeki Plaza" le 27 décembre 2020--
 INSERT INTO JoueurSucces VALUES (1, 2, '2022-12-01'); --Yacine a obtenu le succès "Insaisissable" le 1er décembre 2022--
@@ -249,3 +255,4 @@ INSERT INTO JoueurSucces VALUES (1, 2, '2022-12-01'); --Yacine a obtenu le succ�
 INSERT INTO JeuGenre VALUES (1, 1); --Cyberpunk 2077 est un RPG--
 INSERT INTO JeuGenre VALUES (2, 2); --NFS Unbound est un jeu de course--
 INSERT INTO JeuGenre VALUES (1, 3); --Cyberpunk 2077 est un jeu d'action--
+INSERT INTO JeuGenre VALUES (3, 3); --Batman est un jeu d'action--
