@@ -211,10 +211,44 @@ CREATE VIEW CommentaireJeu AS
         JOIN Joueur AS jo ON c.idJoueur = jo.idJoueur
 );
 
+CREATE VIEW Profil AS
+(
+    SELECT 
+        jo.pseudo AS pseudo,
+        jo.idJoueur AS idJoueur,
+        j.idJeu,
+        j.titre,
+        j.prix,
+        j.date_de_sortie,
+        j.pegi,
+        j.idDeveloppeur,
+        j.idEditeur,
+        d.nomEntreprise AS developpeur,
+        ed.nomEntreprise AS editeur,
+        j.description_Jeu AS description,
+        j.image_path,
+        COALESCE(jj.idJoueur, p.idJoueur1) AS proprietaire,
+        p.idJoueur2 AS partage_avec,
+        ROUND((COUNT(js.idSucces) * 100.0 / NULLIF(COUNT(s.idSucces), 0)), 2) AS taux_completion
+    FROM 
+        Jeu AS j
+        LEFT JOIN JoueurJeu AS jj ON j.idJeu = jj.idJeu
+        LEFT JOIN Partage AS p ON j.idJeu = p.idJeu AND p.idJoueur2 = jj.idJoueur
+        LEFT JOIN Entreprise AS d ON j.idDeveloppeur = d.idEntreprise
+        LEFT JOIN Entreprise AS ed ON j.idEditeur = ed.idEntreprise
+        LEFT JOIN Succes AS s ON j.idJeu = s.idJeu
+        LEFT JOIN JoueurSucces AS js ON s.idSucces = js.idSucces AND js.idJoueur = COALESCE(jj.idJoueur, p.idJoueur2)
+        LEFT JOIN Joueur AS jo ON COALESCE(jj.idJoueur, p.idJoueur2) = jo.idJoueur
+    GROUP BY 
+        jo.pseudo, jo.idJoueur, j.idJeu, j.titre, j.prix, j.date_de_sortie, j.pegi, j.idDeveloppeur, j.idEditeur, j.description_Jeu, j.image_path, d.nomEntreprise, ed.nomEntreprise, jj.idJoueur, p.idJoueur1, p.idJoueur2
+);
+
+
+
 ---<Insertions>---
 
-INSERT INTO Joueur VALUES (1, 'yacine20005', 'PasDeWeekendAvecPrisci', 'Yacine', 'ya.hamadouche@gmail.com', '2005-12-24', 55.00); --Joueur 1--
-INSERT INTO Joueur VALUES (2, 'SkY', 'Gael_ma_crush_92i', 'Liam', 'liam@outlook.com', '2005-12-16', 2546.00); --Joueur 2-- --Liam est riche grâce au CROUS--
+INSERT INTO Joueur VALUES (1, 'yacine20005', '$2b$12$koVR5g1jNH/PvGrHNTlJoOTRN6wQk/ckllO3Q8owR19oBbAql2/US', 'Yacine', 'ya.hamadouche@gmail.com', '2005-12-24', 55.00); --Joueur 1--
+INSERT INTO Joueur VALUES (2, 'SkY', '$2b$12$VUvcWjC9aQ64sabB443xh.LLmzdXFPq5o0l71CESvcup9tNLgnt1C', 'Liam', 'liam@outlook.com', '2005-12-16', 2546.00); --Joueur 2-- --Liam est riche grâce au CROUS--
 
 INSERT INTO Entreprise VALUES (1, 'CD Projekt Red', 'Pologne'); --CD Projekt Red est une entreprise polonaise--
 INSERT INTO Entreprise VALUES (2, 'Criterion', 'Royaume-Uni'); --Criterion est une entreprise britannique--
@@ -232,11 +266,14 @@ INSERT INTO Jeu VALUES (3, 'Batman Arkham Knight', 59.99, '2015-06-23', 18, 4, 5
 
 INSERT INTO Succes VALUES (1, 1, 'Braquage Konpeki Plaza', 'Vous avez eu ce que vous vouliez mais à quel prix ?'); --Succès du jeu Cyberpunk 2077--
 INSERT INTO Succes VALUES (2, 2, 'Insaisissable', 'Échappez à une poursuite policière en Alerte 5 au volant d’une voiture A+'); --Succès du jeu NFS Unbound--
+INSERT INTO Succes VALUES (3, 2, 'Le roi de la route', 'Remportez toutes les courses de rue'); --Succès du jeu NFS Unbound--
+INSERT INTO Succes VALUES (4, 2, 'Le roi du drift', 'Remportez toutes les courses de drift'); --Succès du jeu NFS Unbound--
+INSERT INTO Succes VALUES (5, 2, 'Le roi de la déliquence', 'Echappez à 10 poursuites policières'); --Succès du NFS Unbound--
 
 INSERT INTO Commentaire VALUES (1, 17, 'J''ai versé une larme à la fin du jeu vraiment un banger vidéoludique', 1, 1); --Commentaire du joueur 1 sur le jeu 1--
 INSERT INTO Commentaire VALUES (2, 19, 'Le jeu est parfait, mais beaucoup trop de scènes obscènes', 1, 2); --Commentaire du joueur 2 sur le jeu 1--
 INSERT INTO Commentaire VALUES (3, 14, 'J''ai adoré le jeu mais les voitures sont très désequilibrés en multijoueur...', 2, 1); --Commentaire du joueur 1 sur le jeu 2--
-INSERT INTO Commentaire VALUES (4, 18, 'Je me suis senti dans la peau du chevalier noir pendant toute la durée du jeu, je reccomande vivement pour tous les fans de la licence.', 3, 2); --Commentaire du joueur 2 sur le jeu 3 --
+INSERT INTO Commentaire VALUES (4, 18, 'Je me suis senti dans la peau du chevalier noir pendant toute la durée du jeu, je recommande vivement pour tous les fans de la licence.', 3, 2); --Commentaire du joueur 2 sur le jeu 3 --
 
 INSERT INTO Transaction_user VALUES (1, 1, 1, 69.99, '2020-12-26', 'Achat du jeu Cyberpunk 2077'); --Transaction d'achat du jeu Cyberpunk 2077 par le joueur 1--
 INSERT INTO Transaction_user VALUES (2, 1, 2, 39.99, '2022-11-17', 'Précommande NFS Unbound'); --Transaction de précommande du jeu NFS Unbound par le joueur 1--

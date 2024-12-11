@@ -1,15 +1,16 @@
 import time
 import flask
-import db_yacine as db
+import db_yacine as db # Importation du module db_yacine.py
+#import db_liam as db
 from passlib.context import CryptContext
-password_ctx = CryptContext(schemes=["bcrypt"])
-session = {}
+password_ctx = CryptContext(schemes=["bcrypt"]) # Création d'un objet pour gérer les mots de passe
+session = {} # Dictionnaire pour stocker les informations de session
 
 app = flask.Flask(__name__)
 
 @app.context_processor
 def inject_session():
-    return dict(session=session)
+    return dict(session=session) # Permet d'accéder à la session dans les templates
 
 @app.route("/boutique")
 def boutique():
@@ -22,7 +23,7 @@ def boutique():
     jeux = cur.fetchall()
     cur.close()
     conn.close()
-    return flask.render_template("boutique.html", h = h, m = m, s = s, jeux = jeux)
+    return flask.render_template("boutique.html", jeux = jeux)
 
 @app.route('/recherche', methods=['GET'])
 def recherche():
@@ -33,9 +34,7 @@ def recherche():
         if(type_recherche in ["titre", "genres", "developpeur", "editeur"]):
             conn = db.connect()
             cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
-             
-            cur.execute(f"SELECT * FROM Boutique WHERE {type_recherche} ILIKE %s", ('%' + query + '%',))
-
+            cur.execute(f"SELECT * FROM Boutique WHERE {type_recherche} ILIKE %s", ('%' + query + '%',)) # Utilisation de ilike pour ignorer la casse des caractères
             resultats = cur.fetchall()
             cur.close()
             conn.close()
@@ -46,35 +45,42 @@ def recherche():
 
 @app.route("/profil")
 def profil():
-    return flask.render_template("profil.html")
+    conn = db.connect()
+    cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
+    cur.execute("SELECT * FROM profil WHERE idJoueur = %s;", (session["user_id"],))
+    resultat = cur.fetchall()
+    cur.execute("SELECT pseudo FROM profil WHERE idJoueur = %s;", (session["user_id"],))
+    pseudo = cur.fetchall()
+    pseudo = pseudo[0].pseudo # Permet de récupérer le pseudo de l'utilisateur sans le tuple
+    conn.close()
+    return flask.render_template("profil.html", resultat = resultat, pseudo = pseudo)
 
 
 @app.route("/connexion", methods=["GET", "POST"])
 def connexion():
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
-    etat = 0 #0 si rien, 1 si pseudo/mail faux, 2 si mdp faux, 3 si connexion reussie!
+    etat = 0 # 0 si rien, 1 si pseudo/mail faux, 2 si mdp faux, 3 si connexion reussie!
     user = flask.request.form.get('user')
     password = flask.request.form.get('password')
-    if user and password : 
+    
+    if user and password :
         etat = 1
         if '@' in user:
-            cur.execute("SELECT idJoueur FROM Joueur WHERE email = %s;", (user,))
+            cur.execute("SELECT idJoueur, mot_de_passe FROM Joueur WHERE email = %s;", (user,))
         else:
-            cur.execute("SELECT idJoueur FROM Joueur WHERE pseudo = %s;", (user,)) 
-        user_id = cur.fetchone()
-        user_id = user_id[0] if user_id else None
-        #Utilisateur trouvé
-        if(user_id):
+            cur.execute("SELECT idJoueur, mot_de_passe FROM Joueur WHERE pseudo = %s;", (user,))
+        result = cur.fetchone()
+
+        if result:
             etat = 2
-            #tu prend son mdp et tu le compare avec le hash de celui qu'il as mis
-            cur.execute("SELECT mot_de_passe FROM Joueur WHERE idjoueur = %s;", (user_id,))
-            user_hash = cur.fetchone()
-            user_hash = user_hash[0] if user_hash else None
-            if user_hash == password:  #et si tout est bon il est connecté
-            #if user_hash and password_ctx.verify(password, user_hash):  #verification a rajoute pour prendre en compte les hash
-                session['user_id'] = user_id
+            user_id = result.idjoueur
+            user_hash = result.mot_de_passe
+            verif_mdp = password_ctx.verify(password, user_hash)
+            if verif_mdp:
                 etat = 3
+                session['user_id'] = user_id
+                
     cur.close()
     conn.close()
     if(etat != 3):
@@ -96,32 +102,46 @@ def inscription():
     etat = 0  # 0 = pas d'erreur, 1 = email déjà utilisé, 2 = pseudo déjà utilisé ou trop long, 3 = mot de passe trop court
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
+    
     nom = flask.request.form.get('nom')
     email = flask.request.form.get('email')
     user = flask.request.form.get('user')
     password = flask.request.form.get('password')
     datenaissance = flask.request.form.get('date_de_naissance')
+    
     if(nom and email and user and password and datenaissance):
         if '@' in email and  '.' in email:
             cur.execute("SELECT idJoueur FROM Joueur WHERE email = %s;", (email,))
             if(cur.fetchone()):
                 etat = 1
-                return flask.render_template("inscription.html", etat = etat) 
+                return flask.render_template("inscription.html", etat = etat)
+            
             cur.execute("SELECT idJoueur FROM Joueur WHERE pseudo = %s;", (user,))
             if(cur.fetchone() or len(user) < 3 or len(user) > 16):
                 etat = 2
-                return flask.render_template("inscription.html", etat = etat) 
+                return flask.render_template("inscription.html", etat = etat)
+            
             if(len(password) < 8):
                 etat = 3
-                return flask.render_template("inscription.html", etat = etat) 
+                return flask.render_template("inscription.html", etat = etat)
+            
             if etat == 0:
+                cur.execute("SELECT MAX(idJoueur) FROM Joueur;")
+                max_id = cur.fetchone()
+                if max_id is None:
+                    max_id = 0
+                else:
+                    new_id = max_id.max + 1
+                
                 hash_pw = password_ctx.hash(password) #Calcul du hash du mot de passe à stocker
-                cur.execute("INSERT INTO Joueur (pseudo, email, mot_de_passe, nom, date_naissance, solde) VALUES (%s, %s, %s, %s, %s, 0);", (user, email, hash_pw, nom, datenaissance))
+                cur.execute("INSERT INTO Joueur (idJoueur, pseudo, email, mot_de_passe, nom, date_naissance, solde) VALUES (%s ,%s, %s, %s, %s, %s, 0);", (new_id ,user, email, hash_pw, nom, datenaissance))
             cur.close()
             conn.close()
+            
         if etat == 0:
-            return flask.redirect(flask.url_for('connexion')) 
-    return flask.render_template("inscription.html", etat = etat) 
+            return flask.redirect(flask.url_for('connexion'))
+        
+    return flask.render_template("inscription.html", etat = etat)
 
 @app.route("/jeu/<int:id>")
 def jeu(id):

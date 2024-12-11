@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='nuage.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Questrial&display=swap"
+      rel="stylesheet"
+    />
+    <title>Recherche - Nuage</title>
+  </head>
+  <body>
+    <header>
+      <div class="logo">Nuage</div>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('boutique') }}">Boutique</a></li>
+          <li><a href="{{ url_for('recherche') }}">Recherche</a></li>
+          {% if session.get('user_id') %}
+          <li><a href="{{ url_for('profil') }}">Profil</a></li>
+          <li><a href="{{ url_for('deconnexion') }}">Déconnexion</a></li>
+          {% else %}
+          <li><a href="{{ url_for('connexion') }}">Connexion</a></li>
+          <li><a href="{{ url_for('inscription') }}">inscription</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h1 style="text-align: center">Profil de {{ pseudo }}</h1>
+      <h3 style="text-align: center">Mes jeux</h2>
+      <div class="game-list">
+        {% for jeu in resultat %}
+          <div class="game-card">
+            <img src="{{ url_for('static', filename=jeu.image_path) }}" alt="{{ jeu.titre }}" /> 
+            <h3>{{ jeu.titre }}</h3>
+            <p>Taux de complétion : {{ jeu.taux_completion }}</p>
+          </div>
+        {% endfor %}
+    </main>
+
+    <footer>
+      <p>&copy; 2024 Nuage. Tous droits réservés.</p>
+    </footer>
+  </body>
+</html>
