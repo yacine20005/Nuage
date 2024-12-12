@@ -21,7 +21,6 @@ def boutique():
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
     cur.execute('SELECT * FROM Boutique;')
     jeux = cur.fetchall()
-    print(jeux)
     cur.close()
     conn.close()
     return flask.render_template("boutique.html", jeux = jeux)
@@ -43,8 +42,14 @@ def profil():
     cur.execute("SELECT * FROM CommentaireJeu WHERE Joueur = %s;", (session["user_id"],))
     commentaires = cur.fetchall()
     
-    cur.execute("SELECT DISTINCT * FROM JoueurAmis WHERE idJoueur1 = %s OR idJoueur2 = %s;", (session["user_id"], session["user_id"]))
+    cur.execute("SELECT * FROM JoueurAmis WHERE idJoueur1 = %s", (session["user_id"],))
     amis = cur.fetchall()
+    infos_amis = [] # Dictionnaire pour stocker les informations des amis
+    for ami in amis:
+        if ami.idjoueur1 == session["user_id"]:
+            cur.execute("SELECT * FROM Joueur WHERE idJoueur = %s;", (ami.idjoueur2,))
+            infos_amis.append(cur.fetchone())
+    print(infos_amis)
     
     cur.execute("SELECT Jeu.idJeu, COUNT(Succes.idSucces) AS total_succes FROM Jeu LEFT JOIN Succes ON Jeu.idJeu = Succes.idJeu GROUP BY Jeu.idJeu;")
     liste_jeux = cur.fetchall()
@@ -63,8 +68,7 @@ def profil():
     
     cur.close()
     conn.close()
-    print(amis)
-    return flask.render_template("profil.html", possede=possede, partage=partage, commentaires=commentaires, joueur=joueur, taux_completion_jeux=taux_completion_jeux, amis=amis)
+    return flask.render_template("profil.html", possede=possede, partage=partage, commentaires=commentaires, joueur=joueur, taux_completion_jeux=taux_completion_jeux, infos_amis=infos_amis)
 
 @app.route("/jeu/<int:id>")
 def jeu(id):
@@ -100,7 +104,6 @@ def recherche():
             resultats = cur.fetchall()
             cur.close()
             conn.close()
-            print(resultats)
     return flask.render_template("recherche.html", resultats=resultats)
 
 @app.route("/connexion", methods=["GET", "POST"])

@@ -104,6 +104,7 @@ footer {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1rem;
+  justify-content: center;
 }
 
 .game-card {
@@ -125,6 +126,8 @@ footer {
 }
 
 .game-card p {
+  display: flex;
+  text-align: center;
   font-size: 0.9rem;
   color: var(--text-color);
 }
@@ -196,7 +199,7 @@ footer {
 .text-comm-card {
   background-color: var(--secondary-color);
   border-radius: 5px;
-  padding: 1rem;
+  padding: 1rem
 }
 
 .inscription {
