@@ -1,15 +1,16 @@
 import flask
-import db_yacine as db # Importation du module db_yacine.py
+import db_yacine as db
 #import db_liam as db
 from passlib.context import CryptContext
+from datetime import timedelta # Pour gérer la durée de la session
 password_ctx = CryptContext(schemes=["bcrypt"]) # Création d'un objet pour gérer les mots de passe
-session = {} # Dictionnaire pour stocker les informations de session
 
 app = flask.Flask(__name__)
-
+app.secret_key = 'super_secret'
+app.permanent_session_lifetime = timedelta(days=30)  # La session expirera après 30 jours
 @app.context_processor
 def inject_session():
-    return dict(session=session) # Permet d'accéder à la session dans les templates
+    return dict(session=flask.session) # Permet d'accéder à la session dans les templates
 
 @app.route("/")
 def home():
@@ -25,38 +26,37 @@ def boutique():
     conn.close()
     return flask.render_template("boutique.html", jeux = jeux)
 
-@app.route("/profil")
-def profil():
+@app.route("/profil/<int:id>")
+def profil(id):
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
     
-    cur.execute("SELECT * FROM Joueur WHERE idJoueur = %s;", (session["user_id"],))
+    cur.execute("SELECT * FROM Joueur WHERE idJoueur = %s;", (id,))
     joueur = cur.fetchone()
 
-    cur.execute("SELECT * FROM JoueurPossede WHERE JoueurPossede.idJoueur = %s;", (session["user_id"],))
+    cur.execute("SELECT * FROM JoueurPossede WHERE JoueurPossede.idJoueur = %s;", (id,))
     possede = cur.fetchall()
     
-    cur.execute("SELECT * FROM JoueurPartage WHERE JoueurPartage.idJoueurReceveur = %s;", (session["user_id"],))
+    cur.execute("SELECT * FROM JoueurPartage WHERE JoueurPartage.idJoueurReceveur = %s;", (id,))
     partage = cur.fetchall()
     
-    cur.execute("SELECT * FROM CommentaireJeu WHERE Joueur = %s;", (session["user_id"],))
+    cur.execute("SELECT * FROM CommentaireJeu WHERE Joueur = %s;", (id,))
     commentaires = cur.fetchall()
     
-    cur.execute("SELECT * FROM JoueurAmis WHERE idJoueur1 = %s", (session["user_id"],))
+    cur.execute("SELECT * FROM JoueurAmis WHERE idJoueur1 = %s", (id,))
     amis = cur.fetchall()
     infos_amis = [] # Dictionnaire pour stocker les informations des amis
     for ami in amis:
-        if ami.idjoueur1 == session["user_id"]:
+        if ami.idjoueur1 == flask.session["user_id"]:
             cur.execute("SELECT * FROM Joueur WHERE idJoueur = %s;", (ami.idjoueur2,))
             infos_amis.append(cur.fetchone())
-    print(infos_amis)
     
     cur.execute("SELECT Jeu.idJeu, COUNT(Succes.idSucces) AS total_succes FROM Jeu LEFT JOIN Succes ON Jeu.idJeu = Succes.idJeu GROUP BY Jeu.idJeu;")
     liste_jeux = cur.fetchall()
     
     taux_completion_jeux = {}
     for jeu in liste_jeux:
-        cur.execute("SELECT COUNT(*) AS succes_debloques FROM JoueurSucces JOIN Succes ON JoueurSucces.idSucces = Succes.idSucces WHERE JoueurSucces.idJoueur = %s AND Succes.idJeu = %s", (session["user_id"], jeu.idjeu))
+        cur.execute("SELECT COUNT(*) AS succes_debloques FROM JoueurSucces JOIN Succes ON JoueurSucces.idSucces = Succes.idSucces WHERE JoueurSucces.idJoueur = %s AND Succes.idJeu = %s", (id, jeu.idjeu))
         succes_debloques = cur.fetchone().succes_debloques
         
         if jeu.total_succes > 0:
@@ -87,8 +87,7 @@ def jeu(id):
 
 @app.route("/deconnexion")
 def deconnexion():
-    if 'user_id' in session:  # Vérifie si 'user_id' est présent dans la session
-        session.pop('user_id')  # Supprime 'user_id' de la session
+    flask.session.clear()  # Supprime 'user_id' de la session
     return flask.redirect(flask.url_for('boutique'))  # Redirige vers la boutique
 
 @app.route('/recherche', methods=['GET'])
@@ -129,7 +128,8 @@ def connexion():
             verif_mdp = password_ctx.verify(password, user_hash)
             if verif_mdp:
                 etat = 3
-                session['user_id'] = user_id
+                flask.session.permanent = True
+                flask.session['user_id'] = user_id
                 
     cur.close()
     conn.close()

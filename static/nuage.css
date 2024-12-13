@@ -194,7 +194,7 @@ footer {
 }
 
 .text-descr {
-  margin-left: -8rem;
+  margin-left: -7.77rem;
   margin-top: 3rem;
   padding: auto;
 }
@@ -214,7 +214,7 @@ footer {
 .inscription {
   display: flex;
   justify-content: center;
-  margin: 20px 0;
+  margin: 15px 0;
 }
 
 form .inscription input {
