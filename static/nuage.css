@@ -55,7 +55,7 @@ input {
   padding: 10px;
   background-color: var(--primary-color);
   border: 1px solid #ccc;
-  border-radius: 4px 0 0 4px;;
+  border-radius: 4px 0 0 4px;
   font-size: 16px;
   color: white;
 }
@@ -161,8 +161,17 @@ footer {
   margin-left: auto;
   margin-right: auto;
   margin-top: 3rem;
+  /*display: flex; */
+  align-items: flex-start;
+}
+
+.centered-div_jeu {
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 3rem;
   display: flex;
-  align-items: flex-start; /* Aligne le texte au début de l'image */
+  align-items: flex-start;
 }
 
 .centered-image {
@@ -199,7 +208,7 @@ footer {
 .text-comm-card {
   background-color: var(--secondary-color);
   border-radius: 5px;
-  padding: 1rem
+  padding: 1rem;
 }
 
 .inscription {

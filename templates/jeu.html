@@ -36,7 +36,7 @@
     <main>
       {% for jeu in jeux %}
       <h1 style="text-align: center">{{ jeu.titre }}</h1>
-      <div class="centered-div">
+      <div class="centered-div_jeu">
         <img
           class="centered-image"
           src="{{ url_for('static', filename=jeu.image_path) }}"
@@ -54,7 +54,7 @@
           <a href="{{ url_for('jeu', id=jeu.idjeu) }}" class="btn">Acheter</a>
         </div>
       </div>
-      <div class="centered-div">
+      <div class="centered-div_jeu">
         <h2>Description</h2>
         <div class="text-descr">
           <p>{{ jeu.description }}</p>
@@ -62,7 +62,7 @@
       </div>
       {% endfor %}
 
-      <div class="centered-div">
+      <div class="centered-div_jeu">
         <h2>Commentaires</h2>
         <div class="text-comm">
           {% for commentaire in commentaires %}
