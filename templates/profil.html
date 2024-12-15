@@ -49,6 +49,11 @@
           <strong>Email</strong> : {{ joueur.email }}<br />
           <strong>Date de naissance</strong> : {{ joueur.date_naissance }}<br />
           <strong>Soldes</strong> : {{ joueur.solde }}€<br />
+          {% if joueur.idjoueur != session.get('user_id') %}
+          <form action="{{ url_for('ajout_ami', id_ami=joueur.idjoueur) }}" method="post">
+            <button type="submit">Ajouter en ami</button>
+          </form>
+        {% endif %}
         </div>
         <h3 style="text-align: center">Mes jeux possédés</h3>
         <div class="game-list">

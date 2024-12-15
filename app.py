@@ -70,6 +70,21 @@ def profil(joueur_id):
     conn.close()
     return flask.render_template("profil.html", possede=possede, partage=partage, commentaires=commentaires, joueur=joueur, taux_completion_jeux=taux_completion_jeux, infos_amis=infos_amis)
 
+@app.route("/ajout_ami/<int:id_ami>", methods=["POST"])
+def ajout_ami(id_ami):
+    if 'user_id' in flask.session:
+        conn = db.connect()
+        cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
+        if flask.session['user_id'] < id_ami:
+            cur.execute("INSERT INTO Amitie (idJoueur1, idJoueur2) VALUES (%s, %s);", (flask.session['user_id'], id_ami))
+        else:
+            cur.execute("INSERT INTO Amitie (idJoueur1, idJoueur2) VALUES (%s, %s);", (id_ami, flask.session['user_id']))
+        cur.close()
+        conn.close()
+        return flask.redirect(flask.url_for('profil', joueur_id=id_ami))
+    else:
+        return flask.redirect(flask.url_for('connexion'))
+
 @app.route("/jeu/<int:id>")
 def jeu(id):
     conn = db.connect()
@@ -137,9 +152,6 @@ def connexion():
         return flask.render_template("connexion.html", etat = etat)
     else:
         return flask.redirect(flask.url_for('boutique'))
-        
-
-
 
 @app.route("/inscription", methods=["GET", "POST"])
 def inscription():
@@ -187,7 +199,6 @@ def inscription():
             return flask.redirect(flask.url_for('connexion'))
         
     return flask.render_template("inscription.html", etat = etat)
-
 
 if __name__ == '__main__':
     app.run(debug=True)
