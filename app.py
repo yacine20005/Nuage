@@ -26,24 +26,24 @@ def boutique():
     conn.close()
     return flask.render_template("boutique.html", jeux = jeux)
 
-@app.route("/profil/<int:id>")
-def profil(id):
+@app.route("/profil/<int:joueur_id>")
+def profil(joueur_id):
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
     
-    cur.execute("SELECT * FROM Joueur WHERE idJoueur = %s;", (id,))
+    cur.execute("SELECT * FROM Joueur WHERE idJoueur = %s;", (joueur_id,))
     joueur = cur.fetchone()
 
-    cur.execute("SELECT * FROM JoueurPossede WHERE JoueurPossede.idJoueur = %s;", (id,))
+    cur.execute("SELECT * FROM JoueurPossede WHERE JoueurPossede.idJoueur = %s;", (joueur_id,))
     possede = cur.fetchall()
     
-    cur.execute("SELECT * FROM JoueurPartage WHERE JoueurPartage.idJoueurReceveur = %s;", (id,))
+    cur.execute("SELECT * FROM JoueurPartage WHERE JoueurPartage.idJoueurReceveur = %s;", (joueur_id,))
     partage = cur.fetchall()
     
-    cur.execute("SELECT * FROM CommentaireJeu WHERE Joueur = %s;", (id,))
+    cur.execute("SELECT * FROM CommentaireJeu WHERE Joueur = %s;", (joueur_id,))
     commentaires = cur.fetchall()
     
-    cur.execute("SELECT * FROM JoueurAmis WHERE idJoueur1 = %s", (id,))
+    cur.execute("SELECT * FROM JoueurAmis WHERE idJoueur1 = %s", (joueur_id,))
     amis = cur.fetchall()
     infos_amis = [] # Dictionnaire pour stocker les informations des amis
     for ami in amis:
@@ -56,7 +56,7 @@ def profil(id):
     
     taux_completion_jeux = {}
     for jeu in liste_jeux:
-        cur.execute("SELECT COUNT(*) AS succes_debloques FROM JoueurSucces JOIN Succes ON JoueurSucces.idSucces = Succes.idSucces WHERE JoueurSucces.idJoueur = %s AND Succes.idJeu = %s", (id, jeu.idjeu))
+        cur.execute("SELECT COUNT(*) AS succes_debloques FROM JoueurSucces JOIN Succes ON JoueurSucces.idSucces = Succes.idSucces WHERE JoueurSucces.idJoueur = %s AND Succes.idJeu = %s", (joueur_id, jeu.idjeu))
         succes_debloques = cur.fetchone().succes_debloques
         
         if jeu.total_succes > 0:

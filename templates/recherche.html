@@ -27,7 +27,11 @@
           <li><a href="{{ url_for('boutique') }}">Boutique</a></li>
           <li><a href="{{ url_for('recherche') }}">Recherche</a></li>
           {% if session.get('user_id') %}
-          <li><a href="{{ url_for('profil') }}">Profil</a></li>
+          <li>
+            <a href="{{ url_for('profil', joueur_id=session.get('user_id')) }}"
+              >Profil</a
+            >
+          </li>
           <li><a href="{{ url_for('deconnexion') }}">Déconnexion</a></li>
           {% else %}
           <li><a href="{{ url_for('connexion') }}">Connexion</a></li>

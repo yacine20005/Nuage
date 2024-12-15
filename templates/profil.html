@@ -27,7 +27,11 @@
           <li><a href="{{ url_for('boutique') }}">Boutique</a></li>
           <li><a href="{{ url_for('recherche') }}">Recherche</a></li>
           {% if session.get('user_id') %}
-          <li><a href="{{ url_for('profil') }}">Profil</a></li>
+          <li>
+            <a href="{{ url_for('profil', joueur_id=session.get('user_id')) }}"
+              >Profil</a
+            >
+          </li>
           <li><a href="{{ url_for('deconnexion') }}">Déconnexion</a></li>
           {% else %}
           <li><a href="{{ url_for('connexion') }}">Connexion</a></li>
@@ -39,68 +43,66 @@
     <main>
       <div class="centered-div">
         <h1 style="text-align: center">Profil de {{ joueur.pseudo }}</h1>
+        <div class="game-card">
+          <strong>ID joueur</strong> : {{ joueur.idjoueur }}<br />
+          <strong>Pseudo</strong> : {{ joueur.pseudo }}<br />
+          <strong>Email</strong> : {{ joueur.email }}<br />
+          <strong>Date de naissance</strong> : {{ joueur.date_naissance }}<br />
+          <strong>Soldes</strong> : {{ joueur.solde }}€<br />
+        </div>
+        <h3 style="text-align: center">Mes jeux possédés</h3>
+        <div class="game-list">
+          {% for jeu in possede %}
           <div class="game-card">
-            <strong>ID joueur</strong> : {{ joueur.idjoueur }}<br />
-            <strong>Pseudo</strong> : {{ joueur.pseudo }}<br />
-            <strong>Email</strong> : {{ joueur.email }}<br />
-            <strong>Date de naissance</strong> : {{ joueur.date_naissance }}<br />
-            <strong>Soldes</strong> : {{ joueur.solde }}€<br />
-          </div>
-          <h3 style="text-align: center">Mes jeux possédés</h3>
-          <div class="game-list">
-            {% for jeu in possede %}
-            <div class="game-card">
-              <img
-                src="{{ url_for('static', filename=jeu.image_path) }}"
-                alt="{{ jeu.titre }}"
-              />
-              <h3>{{ jeu.titre }}</h3>
-              <p>
-                Taux de complétion : {% for taux in taux_completion_jeux %} {% if
-                taux == jeu.idjeu %} {{ taux_completion_jeux[taux] }} {% endif %}
-                {% endfor %}
-                %
-              </p>
-            </div>
-            {% endfor %}
-          </div>
-        <h3 style="text-align: center">Mes jeux prêtés</h3>
-          <div class="game-list">
-            {% for jeu in partage %}
-            <div class="game-card">
-              <img
-                src="{{ url_for('static', filename=jeu.image_path) }}"
-                alt="{{ jeu.titre }}"
-              />
-              <h3>{{ jeu.titre }}</h3>
-              <p>
-                Taux de complétion : {% for taux in taux_completion_jeux %} {% if
-                taux == jeu.idjeu %} {{ taux_completion_jeux[taux] }} {% endif %}
-                {% endfor %}
-                %
-              </p>
-            </div>
-            {% endfor %}
-          </div>
-          <h3 style="text-align: center">Mes Commentaires</h3>
-          <div class="text-comm">
-            {% for commentaire in commentaires %}
-            <p class="text-comm-card">
-              <strong>{{ commentaire.jeu }}</strong> : {{ commentaire.date }}
-              <strong class="align-right">{{ commentaire.note }}/20</strong>
-              <br/>
-              {{ commentaire.textecommentaire }}
+            <img
+              src="{{ url_for('static', filename=jeu.image_path) }}"
+              alt="{{ jeu.titre }}"
+            />
+            <h3>{{ jeu.titre }}</h3>
+            <p>
+              Taux de complétion : {% for taux in taux_completion_jeux %} {% if
+              taux == jeu.idjeu %} {{ taux_completion_jeux[taux] }} {% endif %}
+              {% endfor %} %
             </p>
-            {% endfor %}
           </div>
+          {% endfor %}
+        </div>
+        <h3 style="text-align: center">Mes jeux prêtés</h3>
+        <div class="game-list">
+          {% for jeu in partage %}
+          <div class="game-card">
+            <img
+              src="{{ url_for('static', filename=jeu.image_path) }}"
+              alt="{{ jeu.titre }}"
+            />
+            <h3>{{ jeu.titre }}</h3>
+            <p>
+              Taux de complétion : {% for taux in taux_completion_jeux %} {% if
+              taux == jeu.idjeu %} {{ taux_completion_jeux[taux] }} {% endif %}
+              {% endfor %} %
+            </p>
+          </div>
+          {% endfor %}
+        </div>
+        <h3 style="text-align: center">Mes Commentaires</h3>
+        <div class="text-comm">
+          {% for commentaire in commentaires %}
+          <p class="text-comm-card">
+            <strong>{{ commentaire.jeu }}</strong> : {{ commentaire.date }}
+            <strong class="align-right">{{ commentaire.note }}/20</strong>
+            <br />
+            {{ commentaire.textecommentaire }}
+          </p>
+          {% endfor %}
+        </div>
         <h3 style="text-align: center">Mes amis</h3>
-          <div class="game-list">
-            {% for info_ami in infos_amis %}
-            <div class="game-card">
-              <h3>{{ info_ami.pseudo }}</h3>
-            </div>
-            {% endfor %}
+        <div class="game-list">
+          {% for info_ami in infos_amis %}
+          <div class="game-card">
+            <h3>{{ info_ami.pseudo }}</h3>
           </div>
+          {% endfor %}
+        </div>
       </div>
     </main>
 
