@@ -34,7 +34,11 @@ def profil(joueur_id):
     cur.execute("SELECT * FROM Joueur WHERE idJoueur = %s;", (joueur_id,))
     joueur = cur.fetchone()
 
-    cur.execute("SELECT * FROM JoueurPossede WHERE JoueurPossede.idJoueur = %s;", (joueur_id,))
+    cur.execute("""SELECT *
+        FROM JoueurJeu
+        JOIN Jeu ON JoueurJeu.idJeu = Jeu.idJeu
+        WHERE JoueurJeu.idJoueur = %s;""", (joueur_id,))
+    
     possede = cur.fetchall()
     
     cur.execute("SELECT * FROM JoueurPartage WHERE JoueurPartage.idJoueurReceveur = %s;", (joueur_id,))
