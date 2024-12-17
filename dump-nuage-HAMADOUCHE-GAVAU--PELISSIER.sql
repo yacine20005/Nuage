@@ -197,47 +197,6 @@ CREATE VIEW Boutique AS
         j.idJeu, j.titre, j.prix, j.date_de_sortie, j.pegi, j.idDeveloppeur, j.idEditeur, j.description_Jeu, j.image_path, d.nomEntreprise, ed.nomEntreprise
 );
 
-CREATE VIEW JoueurPossede AS
-(
-    SELECT
-    jj.idJoueur AS idJoueur,
-    j.*
-    FROM
-    JoueurJeu AS jj
-    JOIN Jeu AS j ON jj.idJeu = j.idJeu
-);
-
-CREATE VIEW JoueurPartage AS
-(
-    SELECT
-    j.*,
-    p.idJoueur1 AS idJoueurPartageur,
-    p.idJoueur2 AS idJoueurReceveur
-    FROM
-    Jeu AS j
-    JOIN Partage AS p ON j.idJeu = p.idJeu
-);
-
-CREATE VIEW CommentaireJeu AS
-(
-    SELECT 
-        j.titre AS Jeu,
-        c.note AS Note,
-        c.texteCommentaire AS texteCommentaire,
-        c.idJoueur As Joueur,
-        j.idJeu,
-        jo.pseudo AS Pseudo,
-        j.idDeveloppeur,
-        j.idEditeur,
-        d.nomEntreprise AS Developpeur,
-        ed.nomEntreprise AS Editeur
-    FROM 
-        Jeu AS j
-        JOIN Commentaire AS c ON j.idJeu = c.idJeu
-        JOIN Entreprise AS d ON j.idDeveloppeur = d.idEntreprise
-        JOIN Entreprise AS ed ON j.idEditeur = ed.idEntreprise
-        JOIN Joueur AS jo ON c.idJoueur = jo.idJoueur
-);
 
 CREATE VIEW JoueurAmis AS
 (
@@ -261,20 +220,6 @@ CREATE VIEW JoueurAmis AS
         JOIN Amitie AS a ON j1.idJoueur = a.idJoueur1
         JOIN Joueur AS j2 ON a.idJoueur2 = j2.idJoueur
 );
-
-CREATE VIEW TauxCompletion AS
-SELECT 
-    jj.idJoueur,
-    jj.idJeu,
-    COUNT(js.idSucces) AS succes_debloques,
-    COUNT(s.idSucces) AS succes_total,
-    (COUNT(js.idSucces)::float / COUNT(s.idSucces)::float) * 100 AS taux_completion
-FROM 
-    JoueurJeu jj
-    JOIN Succes s ON jj.idJeu = s.idJeu
-    LEFT JOIN JoueurSucces js ON js.idJoueur = jj.idJoueur AND js.idSucces = s.idSucces
-GROUP BY 
-    jj.idJoueur, jj.idJeu;
 
 ---<Insertions>---
 

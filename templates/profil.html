@@ -93,7 +93,7 @@
         <div class="text-comm">
           {% for commentaire in commentaires %}
           <p class="text-comm-card">
-            <strong>{{ commentaire.jeu }}</strong> : {{ commentaire.date }}
+            <strong>{{ commentaire.jeu_titre }}</strong> : {{ commentaire.date }}
             <strong class="align-right">{{ commentaire.note }}/20</strong>
             <br />
             {{ commentaire.textecommentaire }}

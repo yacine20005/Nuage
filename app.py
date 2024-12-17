@@ -1,8 +1,8 @@
+from datetime import timedelta # Pour gérer la durée de la session
 import flask
+from passlib.context import CryptContext
 import db_yacine as db
 #import db_liam as db
-from passlib.context import CryptContext
-from datetime import timedelta # Pour gérer la durée de la session
 password_ctx = CryptContext(schemes=["bcrypt"]) # Création d'un objet pour gérer les mots de passe
 
 app = flask.Flask(__name__)
@@ -33,18 +33,23 @@ def profil(joueur_id):
     
     cur.execute("SELECT * FROM Joueur WHERE idJoueur = %s;", (joueur_id,))
     joueur = cur.fetchone()
-
-    cur.execute("""SELECT *
-        FROM JoueurJeu
-        JOIN Jeu ON JoueurJeu.idJeu = Jeu.idJeu
-        WHERE JoueurJeu.idJoueur = %s;""", (joueur_id,))
+    
+    cur.execute("""SELECT J.*
+            FROM JoueurJeu JJ
+            JOIN Jeu J ON JJ.idJeu = J.idJeu
+            WHERE JJ.idJoueur = %s;""", (joueur_id,))
     
     possede = cur.fetchall()
     
-    cur.execute("SELECT * FROM JoueurPartage WHERE JoueurPartage.idJoueurReceveur = %s;", (joueur_id,))
+    cur.execute("""SELECT jeu.*, partage.idJoueur1, partage.idJoueur2
+                FROM Jeu
+                JOIN Partage ON jeu.idJeu = partage.idJeu
+                WHERE partage.idjoueur2 = %s;""", (joueur_id,)) # p.idJoueur2 est le joueur qui reçoit le jeu tandis que p.idJoueur1 est le joueur qui partage le jeu
     partage = cur.fetchall()
     
-    cur.execute("SELECT * FROM CommentaireJeu WHERE Joueur = %s;", (joueur_id,))
+    cur.execute("""SELECT commentaire.*, jeu.titre AS jeu_titre, jeu.idjeu AS jeu_id, joueur.pseudo
+                    FROM Jeu JOIN Commentaire ON jeu.idjeu = commentaire.idjeu JOIN Joueur ON commentaire.idjoueur = joueur.idjoueur 
+                    WHERE commentaire.idjoueur = %s;""", (joueur_id,))
     commentaires = cur.fetchall()
     
     cur.execute("SELECT * FROM JoueurAmis WHERE idJoueur1 = %s", (joueur_id,))
@@ -97,7 +102,9 @@ def jeu(id):
     cur.execute("SELECT * FROM Boutique WHERE idjeu = %s;", (id,))  # Utilisation de paramètres préparés pour éviter l'injection SQL car psycopg2 se charge de gérer la valeur
     jeux = cur.fetchall()
         
-    cur.execute("SELECT * FROM CommentaireJeu WHERE idjeu = %s;", (id,))
+    cur.execute("""SELECT commentaire.*, jeu.titre AS jeu_titre, jeu.idjeu AS jeu_id, joueur.pseudo
+                    FROM Jeu JOIN Commentaire ON jeu.idjeu = commentaire.idjeu JOIN Joueur ON commentaire.idjoueur = joueur.idjoueur 
+                    WHERE commentaire.idjeu = %s;""", (id,))
     commentaires = cur.fetchall()
     
     cur.close()
