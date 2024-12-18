@@ -1,4 +1,4 @@
-from datetime import timedelta # Pour gérer la durée de la session
+from datetime import timedelta # Pour gérer la durée de la session et la date du jour
 import flask
 from passlib.context import CryptContext
 #import db_yacine as db
@@ -126,7 +126,7 @@ def jeu(id):
                     WHERE commentaire.idjeu = %s;""", (id,))
     commentaires = cur.fetchall()
     
-    if flask.session["user_id"]:
+    if "user_id" in flask.session:
         cur.execute("""SELECT J.*
             FROM JoueurJeu JJ
             JOIN Jeu J ON JJ.idJeu = J.idJeu
@@ -139,6 +139,41 @@ def jeu(id):
     cur.close()
     conn.close()
     return flask.render_template("jeu.html", jeux=jeux, commentaires=commentaires, possede = possede)
+
+
+@app.route("/achat_jeu/<int:idjeu>")
+def achat_jeu(idjeu):
+    if "user_id" in flask.session:
+        conn = db.connect()
+        cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
+
+        cur.execute("SELECT solde FROM Joueur WHERE idjoueur = %s;", (flask.session["user_id"],))  # Utilisation de paramètres préparés pour éviter l'injection SQL car psycopg2 se charge de gérer la valeur
+        solde = cur.fetchone()
+        solde = solde[0]
+        cur.execute("SELECT titre, prix from jeu WHERE idjeu = %s;", (idjeu,))
+        infojeu = cur.fetchone()
+        if solde < infojeu.prix:
+            return "Solde insufissant a l'achat"
+        else:
+            solde -= infojeu.prix
+            cur.execute("UPDATE joueur SET solde = %s WHERE idjoueur = %s", (solde, flask.session["user_id"]))
+            cur.execute("INSERT INTO JoueurJeu VALUES (%s, %s)", (flask.session["user_id"], idjeu))
+            info = f"Achat du jeu {infojeu.titre}"
+            print(info)
+            cur.execute("SELECT MAX(idTransaction) FROM Transaction_user;")
+            max_id = cur.fetchone()
+            if max_id is None:
+                max_id = 0
+            else:
+                new_id = max_id.max + 1
+            cur.execute("INSERT INTO Transaction_user (idTransaction, idJoueur, idJeu, montant, objet_transaction) VALUES (%s, %s, %s, %s, %s);", (new_id, flask.session["user_id"], idjeu, infojeu.prix, info,))
+    return flask.redirect(flask.url_for('profil', joueur_id=flask.session["user_id"]))
+    
+
+@app.route("/partage_jeu/<int:idjeu>/<int:idjoueur>")
+def partage_jeu(idjeu, idjoueur):
+    pass
+
 
 @app.route("/deconnexion")
 def deconnexion():

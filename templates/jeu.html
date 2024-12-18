@@ -55,13 +55,15 @@
           <p>Prix : {{ jeu.prix }}$</p>
           <p>Note : {{ jeu.notemoyenne }}</p>
           <br />
-          {% if possede %}
-          
-          <p> Déja possedé abruti </p>
+          {% if session.get('user_id') %}
+            {% if possede %}
+            
+            <a href="{{ url_for('jeu', id=jeu.idjeu) }}" class="btn">Partager le jeu</a>
 
-          {% else %} 
-          <a href="{{ url_for('jeu', id=jeu.idjeu) }}" class="btn">Acheter</a>
-          {% endif %}
+            {% else %} 
+            <a href="{{ url_for('achat_jeu', idjeu=jeu.idjeu) }}" class="btn">Acheter</a>
+            {% endif %}
+          {% endif  %}
         </div>
       </div>
       <div class="centered-div_jeu">
