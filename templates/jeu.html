@@ -57,8 +57,26 @@
           <br />
           {% if session.get('user_id') %}
             {% if possede %}
-            
-            <a href="{{ url_for('jeu', id=jeu.idjeu) }}" class="btn">Partager le jeu</a>
+            <!-- Formulaire de partage avec menu déroulant -->
+            <form action="{{ url_for('partage_jeu', idjeu=jeu.idjeu) }}" methods ="POST">
+              <!-- Checkbox cachée -->
+              <input type="checkbox" id="toggleInput" style="display: none;" />
+        
+              <!-- Label stylisé pour déclencher l'apparition -->
+              <label for="toggleInput" class="btn-reappro">Partager le jeu</label>
+        
+              <!-- Conteneur de l'input (menu déroulant) -->
+              <div id="inputContainer" class="hidden">
+                <label for="amisSelect">Choisissez un ami :</label>
+                <select name="ami" id="amisSelect">
+                  <!-- Remplir dynamiquement avec la liste des amis -->
+                  {% for ami in amis %}
+                  <option value="{{ ami.idjoueur2 }}">{{ ami.pseudo2 }}</option>
+                  {% endfor %}
+                </select>
+                <button type="submit">Partager</button>
+              </div>
+            </form>
 
             {% else %} 
             <a href="{{ url_for('achat_jeu', idjeu=jeu.idjeu) }}" class="btn">Acheter</a>

@@ -115,6 +115,7 @@ def ajout_ami(id_ami):
 @app.route("/jeu/<int:id>")
 def jeu(id):
     possede = False
+    amis = None
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
     
@@ -135,10 +136,13 @@ def jeu(id):
         for jeu in jeuxpossede:
             if jeu.idjeu == id:
                 possede = True
+        cur.execute("SELECT * FROM JoueurAmis WHERE idJoueur1 = %s", (flask.session["user_id"],))
+        amis = cur.fetchall()
+        print(amis)
 
     cur.close()
     conn.close()
-    return flask.render_template("jeu.html", jeux=jeux, commentaires=commentaires, possede = possede)
+    return flask.render_template("jeu.html", jeux=jeux, commentaires=commentaires, possede = possede, amis = amis)
 
 
 @app.route("/achat_jeu/<int:idjeu>")
@@ -167,12 +171,24 @@ def achat_jeu(idjeu):
             else:
                 new_id = max_id.max + 1
             cur.execute("INSERT INTO Transaction_user (idTransaction, idJoueur, idJeu, montant, objet_transaction) VALUES (%s, %s, %s, %s, %s);", (new_id, flask.session["user_id"], idjeu, infojeu.prix, info,))
+    cur.close()
+    conn.close()
     return flask.redirect(flask.url_for('profil', joueur_id=flask.session["user_id"]))
     
 
-@app.route("/partage_jeu/<int:idjeu>/<int:idjoueur>")
-def partage_jeu(idjeu, idjoueur):
-    pass
+@app.route("/partage_jeu/<int:idjeu>", methods = ["Post"])
+def partage_jeu(idjeu):
+    """CREATE TABLE Partage (
+    idJoueur1 INT,
+    idJoueur2 INT,
+    idJeu INT,"""
+    conn = db.connect()
+    cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
+    idjoueur = flask.request.form.get('ami')
+    cur.execute("INSERT INTO PARTAGE VALUES (%s, %s, %s);", (flask.session["user_id"], idjoueur, idjeu))
+    cur.close()
+    conn.close()
+
 
 
 @app.route("/deconnexion")
