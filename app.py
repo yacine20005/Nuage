@@ -1,8 +1,8 @@
 from datetime import timedelta # Pour gérer la durée de la session
 import flask
 from passlib.context import CryptContext
-import db_yacine as db
-#import db_liam as db
+#import db_yacine as db
+import db_liam as db
 password_ctx = CryptContext(schemes=["bcrypt"]) # Création d'un objet pour gérer les mots de passe
 
 app = flask.Flask(__name__)
@@ -79,6 +79,24 @@ def profil(joueur_id):
     conn.close()
     return flask.render_template("profil.html", possede=possede, partage=partage, commentaires=commentaires, joueur=joueur, taux_completion_jeux=taux_completion_jeux, infos_amis=infos_amis)
 
+@app.route("/reapprovisionnement", methods=["POST"])
+def reapprovisionner():
+    conn = db.connect()
+    cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
+
+    montant = int(flask.request.form.get("montant"))
+    if montant <= 0:
+        return flask.redirect(flask.url_for('profil', joueur_id = flask.session["user_id"]))
+    cur.execute("SELECT solde FROM Joueur WHERE idjoueur = %s;", (flask.session["user_id"],))  # Utilisation de paramètres préparés pour éviter l'injection SQL car psycopg2 se charge de gérer la valeur
+    solde = cur.fetchone()
+    solde = solde[0]
+    solde += montant
+    cur.execute("UPDATE joueur SET solde = %s WHERE idjoueur = %s", (solde, flask.session["user_id"]))
+
+    cur.close()
+    conn.close()
+    return flask.redirect(flask.url_for('profil', joueur_id = flask.session["user_id"]))
+
 @app.route("/ajout_ami/<int:id_ami>", methods=["POST"])
 def ajout_ami(id_ami):
     if 'user_id' in flask.session:
@@ -96,6 +114,7 @@ def ajout_ami(id_ami):
 
 @app.route("/jeu/<int:id>")
 def jeu(id):
+    possede = False
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
     
@@ -107,9 +126,19 @@ def jeu(id):
                     WHERE commentaire.idjeu = %s;""", (id,))
     commentaires = cur.fetchall()
     
+    if flask.session["user_id"]:
+        cur.execute("""SELECT J.*
+            FROM JoueurJeu JJ
+            JOIN Jeu J ON JJ.idJeu = J.idJeu
+            WHERE JJ.idJoueur = %s;""", (flask.session["user_id"],))
+        jeuxpossede = cur.fetchall()
+        for jeu in jeuxpossede:
+            if jeu.idjeu == id:
+                possede = True
+
     cur.close()
     conn.close()
-    return flask.render_template("jeu.html", jeux=jeux, commentaires=commentaires)
+    return flask.render_template("jeu.html", jeux=jeux, commentaires=commentaires, possede = possede)
 
 @app.route("/deconnexion")
 def deconnexion():

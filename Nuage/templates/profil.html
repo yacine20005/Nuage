@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='nuage.css') }}"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Questrial&display=swap"
+      rel="stylesheet"
+    />
+    <title>Jeu - Nuage</title>
+  </head>
+  <body>
+    <header>
+      <div class="logo">Nuage</div>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('boutique') }}">Boutique</a></li>
+          <li><a href="{{ url_for('recherche') }}">Recherche</a></li>
+          {% if session.get('user_id') %}
+          <li><a href="{{ url_for('profil') }}">Profil</a></li>
+          <li><a href="{{ url_for('deconnexion') }}">Déconnexion</a></li>
+          {% else %}
+          <li><a href="{{ url_for('connexion') }}">Connexion</a></li>
+          <li><a href="{{ url_for('inscription') }}">inscription</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      
+    </main>
+
+    <footer>
+      <p>&copy; 2024 Nuage. Tous droits réservés.</p>
+    </footer>
+  </body>
+</html>

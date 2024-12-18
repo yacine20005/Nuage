@@ -55,7 +55,13 @@
           <p>Prix : {{ jeu.prix }}$</p>
           <p>Note : {{ jeu.notemoyenne }}</p>
           <br />
+          {% if possede %}
+          
+          <p> Déja possedé abruti </p>
+
+          {% else %} 
           <a href="{{ url_for('jeu', id=jeu.idjeu) }}" class="btn">Acheter</a>
+          {% endif %}
         </div>
       </div>
       <div class="centered-div_jeu">

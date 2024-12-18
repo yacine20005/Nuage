@@ -227,3 +227,72 @@ form .inscription input {
   color: white;
   margin-bottom: 10px;
 }
+
+
+
+
+
+
+/* Cache le conteneur de l'input par défaut */
+.hidden {
+  display: none;
+  margin-top: 10px;
+}
+
+/* Affiche le conteneur si la checkbox est cochée */
+#toggleInput:checked + label + #inputContainer {
+  display: block;
+}
+
+/* Bouton Réapprovisionner (adapté au design global) */
+.btn-reappro {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+.btn-reappro:hover {
+  background-color: var(--hover-color);
+}
+
+/* Conteneur d'input pour la saisie du montant */
+#inputContainer {
+  margin-top: 10px;
+  text-align: center;
+}
+
+#inputContainer input {
+  padding: 10px;
+  width: 200px;
+  background-color: var(--primary-color);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  color: var(--text-color);
+}
+
+#inputContainer input::placeholder {
+  color: #ccc;
+}
+
+#inputContainer button {
+  padding: 10px 15px;
+  margin-left: 10px;
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#inputContainer button:hover {
+  background-color: var(--hover-color);
+}

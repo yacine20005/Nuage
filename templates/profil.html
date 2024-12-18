@@ -42,13 +42,37 @@
     </header>
     <main>
       <div class="centered-div">
+        {% if session.get('user_id') and joueur.idjoueur == session.get('user_id')%}
+        <h1 style="text-align: center">Votre Profil</h1>
+        {% else %}
         <h1 style="text-align: center">Profil de {{ joueur.pseudo }}</h1>
+        {% endif %}
         <div class="game-card">
           <strong>ID joueur</strong> : {{ joueur.idjoueur }}<br />
           <strong>Pseudo</strong> : {{ joueur.pseudo }}<br />
           <strong>Email</strong> : {{ joueur.email }}<br />
           <strong>Date de naissance</strong> : {{ joueur.date_naissance }}<br />
-          <strong>Soldes</strong> : {{ joueur.solde }}€<br />
+          <strong>Solde</strong> : {{ joueur.solde }}€<br />
+
+
+          {% if session.get('user_id') and joueur.idjoueur == session.get('user_id') %}
+          <form action="{{ url_for('reapprovisionner') }}" method="post">
+            <!-- Checkbox cachée -->
+            <input type="checkbox" id="toggleInput" style="display: none;" />
+          
+            <!-- Label stylisé pour déclencher l'apparition -->
+            <label for="toggleInput" class="btn-reappro">Réapprovisionner</label>
+          
+            <!-- Conteneur de l'input -->
+            <div id="inputContainer" class="hidden">
+              <label for="montant">Entrez un montant :</label>
+              <input type="number" name="montant" id="montant" placeholder="Ex : 100" required />
+              <button type="submit">Valider</button>
+            </div>
+          </form>
+          {% endif %}
+
+
           {% if joueur.idjoueur != session.get('user_id') %}
           <form action="{{ url_for('ajout_ami', id_ami=joueur.idjoueur) }}" method="post">
             <button type="submit">Ajouter en ami</button>
