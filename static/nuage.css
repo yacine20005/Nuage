@@ -228,11 +228,6 @@ form .inscription input {
   margin-bottom: 10px;
 }
 
-
-
-
-
-
 /* Cache le conteneur de l'input par défaut */
 .hidden {
   display: none;

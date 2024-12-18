@@ -1,8 +1,8 @@
 from datetime import timedelta # Pour gérer la durée de la session
 import flask
 from passlib.context import CryptContext
-#import db_yacine as db
-import db_liam as db
+import db_yacine as db
+#import db_liam as db
 password_ctx = CryptContext(schemes=["bcrypt"]) # Création d'un objet pour gérer les mots de passe
 
 app = flask.Flask(__name__)
