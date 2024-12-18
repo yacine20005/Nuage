@@ -56,7 +56,7 @@ def profil(joueur_id):
     amis = cur.fetchall()
     infos_amis = [] # Dictionnaire pour stocker les informations des amis
     for ami in amis:
-        if ami.idjoueur1 == flask.session["user_id"]:
+        if ami.idjoueur1 == joueur_id:
             cur.execute("SELECT * FROM Joueur WHERE idJoueur = %s;", (ami.idjoueur2,))
             infos_amis.append(cur.fetchone())
     
@@ -116,6 +116,7 @@ def ajout_ami(id_ami):
 def jeu(id):
     possede = False
     amis = None
+    succes_obtenu = None
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
     
@@ -138,11 +139,18 @@ def jeu(id):
                 possede = True
         cur.execute("SELECT * FROM JoueurAmis WHERE idJoueur1 = %s", (flask.session["user_id"],))
         amis = cur.fetchall()
-        print(amis)
 
+    cur.execute("SELECT * FROM Succes WHERE idJeu= %s;", (id,))
+    succes = cur.fetchall()
+    
+    if "user_id" in flask.session:
+        cur.execute("SELECT * FROM JoueurSucces WHERE idJoueur = %s;", (flask.session["user_id"],))
+        succes_obtenu = cur.fetchall()
+        print(succes_obtenu)
+    
     cur.close()
     conn.close()
-    return flask.render_template("jeu.html", jeux=jeux, commentaires=commentaires, possede = possede, amis = amis)
+    return flask.render_template("jeu.html", jeux=jeux, commentaires=commentaires, possede = possede, amis = amis, succes = succes, succes_obtenu = succes_obtenu)
 
 
 @app.route("/achat_jeu/<int:idjeu>")
@@ -151,11 +159,15 @@ def achat_jeu(idjeu):
         conn = db.connect()
         cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
 
-        cur.execute("SELECT solde FROM Joueur WHERE idjoueur = %s;", (flask.session["user_id"],))  # Utilisation de paramètres préparés pour éviter l'injection SQL car psycopg2 se charge de gérer la valeur
+        cur.execute("SELECT solde FROM Joueur WHERE idjoueur = %s;", (flask.session["user_id"],))
         solde = cur.fetchone()
         solde = solde[0]
-        cur.execute("SELECT titre, prix from jeu WHERE idjeu = %s;", (idjeu,))
+        cur.execute("SELECT titre, prix, pegi from jeu WHERE idjeu = %s;", (idjeu,))
         infojeu = cur.fetchone()
+        cur.execute("SELECT DATE_PART('year', AGE(date_naissance)) FROM joueur WHERE idjoueur = %s;", (flask.session["user_id"],)) # La fonction DATE_PART() permet d'extraire seulement l'année tandis que la fonction AGE() permet de calculer l'âge à partir de la date de naissance
+        age = int(cur.fetchone()[0])
+        if age < infojeu.pegi:
+            return "Vous n'avez pas l'âge requis pour acheter ce jeu"
         if solde < infojeu.prix:
             return "Solde insufissant a l'achat"
         else:
@@ -176,19 +188,16 @@ def achat_jeu(idjeu):
     return flask.redirect(flask.url_for('profil', joueur_id=flask.session["user_id"]))
     
 
-@app.route("/partage_jeu/<int:idjeu>", methods = ["Post"])
+@app.route("/partage_jeu/<int:idjeu>", methods = ["POST"])
 def partage_jeu(idjeu):
-    """CREATE TABLE Partage (
-    idJoueur1 INT,
-    idJoueur2 INT,
-    idJeu INT,"""
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
     idjoueur = flask.request.form.get('ami')
+    print(idjoueur)
     cur.execute("INSERT INTO PARTAGE VALUES (%s, %s, %s);", (flask.session["user_id"], idjoueur, idjeu))
     cur.close()
     conn.close()
-
+    return flask.redirect(flask.url_for('profil', joueur_id=idjoueur))
 
 
 @app.route("/deconnexion")

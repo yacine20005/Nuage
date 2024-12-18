@@ -58,7 +58,7 @@
           {% if session.get('user_id') %}
             {% if possede %}
             <!-- Formulaire de partage avec menu déroulant -->
-            <form action="{{ url_for('partage_jeu', idjeu=jeu.idjeu) }}" methods ="POST">
+            <form action="{{ url_for('partage_jeu', idjeu=jeu.idjeu) }}" method ="POST">
               <!-- Checkbox cachée -->
               <input type="checkbox" id="toggleInput" style="display: none;" />
         
@@ -92,6 +92,22 @@
       </div>
       {% endfor %}
 
+      <div class="centered-div_jeu">
+        <h2>Succès</h2>
+        <div class="text-comm">
+          {% for succes in succes %}
+          <p class="text-comm-card"> <strong> {{ succes.intitule }} </strong> : {{ succes.description_succes }}
+          <br />
+          {% for succes_obtenu in succes_obtenu %}
+            {% if succes.idsucces == succes_obtenu.idsucces %}
+              <strong style="color: green;">Obtenu</strong>
+            {% endif %}
+          {% endfor %}
+        </p>
+          {% endfor %}
+        </div>
+      </div>
+      
       <div class="centered-div_jeu">
         <h2>Commentaires</h2>
         <div class="text-comm">

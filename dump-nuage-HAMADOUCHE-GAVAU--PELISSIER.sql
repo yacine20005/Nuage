@@ -228,7 +228,7 @@ INSERT INTO Joueur VALUES (2, 'SkY', '$2b$12$VUvcWjC9aQ64sabB443xh.LLmzdXFPq5o0l
 INSERT INTO Joueur VALUES (3, 'playerOne', '$2b$12$koVR5g1jNH/PvGrHNTlJoOTRN6wQk/ckllO3Q8owR19oBbAql2/US', 'John', 'john@example.com', '1990-01-01', 100.00); --Joueur 3--
 INSERT INTO Joueur VALUES (4, 'gamerGirl', '$2b$12$koVR5g1jNH/PvGrHNTlJoOTRN6wQk/ckllO3Q8owR19oBbAql2/US', 'Jane', 'jane@example.com', '1992-02-02', 200.00); --Joueur 4--
 INSERT INTO Joueur VALUES (5, 'proGamer', '$2b$12$koVR5g1jNH/PvGrHNTlJoOTRN6wQk/ckllO3Q8owR19oBbAql2/US', 'Alex', 'alex@example.com', '1988-03-03', 300.00); --Joueur 5--
-INSERT INTO Joueur VALUES (6, 'noobMaster', '$2b$12$koVR5g1jNH/PvGrHNTlJoOTRN6wQk/ckllO3Q8owR19oBbAql2/US', 'Chris', 'chris@example.com', '1995-04-04', 400.00); --Joueur 6--
+INSERT INTO Joueur VALUES (6, 'noobMaster', '$2b$12$koVR5g1jNH/PvGrHNTlJoOTRN6wQk/ckllO3Q8owR19oBbAql2/US', 'Chris', 'chris@example.com', '2008-04-04', 400.00); --Joueur 6--
 INSERT INTO Joueur VALUES (7, 'eliteGamer', '$2b$12$koVR5g1jNH/PvGrHNTlJoOTRN6wQk/ckllO3Q8owR19oBbAql2/US', 'Sam', 'sam@example.com', '1993-05-05', 500.00); --Joueur 7--
 
 INSERT INTO Entreprise VALUES (1, 'CD Projekt Red', 'Pologne'); --CD Projekt Red est une entreprise polonaise--
