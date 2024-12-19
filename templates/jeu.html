@@ -55,39 +55,37 @@
           <p>Prix : {{ jeu.prix }}$</p>
           <p>Note : {{ jeu.notemoyenne }}</p>
           <br />
-          {% if session.get('user_id') %}
-            {% if possede %}
-             {% if partage %}
-             <form action="{{ url_for('annuler_partage', id_jeu=jeu.idjeu) }}" method="post">
-              <button type="submit" class="btn">Annuler Partage</button>
-            </form>
-            {% else %}
-            <!-- Formulaire de partage avec menu déroulant -->
-            <form action="{{ url_for('partage_jeu', idjeu=jeu.idjeu) }}" method ="POST">
-              <!-- Checkbox cachée -->
-              <input type="checkbox" id="toggleInput" style="display: none;" />
-        
-              <!-- Label stylisé pour déclencher l'apparition -->
-              <label for="toggleInput" class="btn-reappro">Partager le jeu</label>
-        
-              <!-- Conteneur de l'input (menu déroulant) -->
-              <div id="inputContainer" class="hidden">
-                <label for="amisSelect">Choisissez un ami :</label>
-                <select name="ami" id="amisSelect">
-                  <!-- Remplir dynamiquement avec la liste des amis -->
-                  {% for ami in amis %}
-                  <option value="{{ ami.idjoueur2 }}">{{ ami.pseudo2 }}</option>
-                  {% endfor %}
-                </select>
-                <button type="submit">Partager</button>
-                {% endif %}
-              </div>
-            </form>
+          {% if session.get('user_id') %} {% if possede %} {% if partage %}
+          <form
+            action="{{ url_for('annuler_partage', id_jeu=jeu.idjeu) }}"
+            method="post"
+          >
+            <button type="submit" class="btn">Annuler Partage</button>
+          </form>
+          {% else %}
+          <form
+            action="{{ url_for('partage_jeu', idjeu=jeu.idjeu) }}"
+            method="POST"
+          >
+            <input type="checkbox" id="toggleInput" style="display: none" />
+            <label for="toggleInput" class="btn-reappro">Partager le jeu</label>
+            <div id="inputContainer" class="hidden">
+              <label for="amisSelect">Choisissez un ami :</label>
+              <select name="ami" id="amisSelect">
+                {% for ami in amis %}
+                <option value="{{ ami.idjoueur2 }}">{{ ami.pseudo2 }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit">Partager</button>
+              {% endif %}
+            </div>
+          </form>
 
-            {% else %} 
-            <a href="{{ url_for('achat_jeu', idjeu=jeu.idjeu) }}" class="btn">Acheter</a>
-            {% endif %}
-          {% endif  %}
+          {% else %}
+          <a href="{{ url_for('achat_jeu', idjeu=jeu.idjeu) }}" class="btn"
+            >Acheter</a
+          >
+          {% endif %} {% endif %}
         </div>
       </div>
       <div class="centered-div_jeu">
@@ -102,18 +100,45 @@
         <h2>Succès</h2>
         <div class="text-comm">
           {% for succes in succes %}
-          <p class="text-comm-card"> <strong> {{ succes.intitule }} </strong> : {{ succes.description_succes }}
-          <br />
-          {% for succes_obtenu in succes_obtenu %}
-            {% if succes.idsucces == succes_obtenu.idsucces %}
-              <strong style="color: green;">Obtenu</strong>
-            {% endif %}
-          {% endfor %}
-        </p>
+          <p class="text-comm-card">
+            <strong> {{ succes.intitule }} </strong> : {{
+            succes.description_succes }}
+            <br />
+            {% for succes_obtenu in succes_obtenu %} {% if succes.idsucces ==
+            succes_obtenu.idsucces %}
+            <strong style="color: green">Obtenu</strong>
+            {% endif %} {% endfor %}
+          </p>
           {% endfor %}
         </div>
       </div>
-      
+
+      {% if session.get('user_id') %} {% if possede %}
+      {% for jeu in jeux %}
+      <div class="centered-div_jeu">
+        <h2>Commenter</h2>
+        <div class="text-comm">
+          <form action="{{ url_for('commenter', id_jeu=jeu.idjeu) }}" method="POST">
+            <div>
+              <label for="note">Note (0-20) :</label>
+              <input type="number" name="note" id="note" min="0" max="20" required />
+            </div>
+            <div>
+              <label for="textecommentaire">Commentaire :</label>
+              <textarea
+                name="textecommentaire"
+                id="textecommentaire"
+                required
+              ></textarea>
+            </div>
+            <button type="submit">Envoyer</button>
+          </form>
+        </div>
+      </div>
+      </div>
+      {% endfor %}
+      {% endif %} {% endif %}
+
       <div class="centered-div_jeu">
         <h2>Commentaires</h2>
         <div class="text-comm">

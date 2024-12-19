@@ -1,8 +1,8 @@
 from datetime import timedelta # Pour gérer la durée de la session et la date du jour
 import flask
 from passlib.context import CryptContext
-#import db_yacine as db
-import db_liam as db
+import db_yacine as db
+#import db_liam as db
 password_ctx = CryptContext(schemes=["bcrypt"]) # Création d'un objet pour gérer les mots de passe
 
 app = flask.Flask(__name__)
@@ -28,6 +28,7 @@ def boutique():
 
 @app.route("/profil/<int:joueur_id>")
 def profil(joueur_id):
+    est_ami = False
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
     
@@ -75,9 +76,26 @@ def profil(joueur_id):
             
         taux_completion_jeux[jeu.idjeu] = taux_completion
     
+    cur.execute("SELECT * FROM JoueurSucces WHERE idJoueur = %s;", (joueur_id,))
+    succes_obtenus = cur.fetchall()
+    
+    if "user_id" in flask.session and flask.session["user_id"] != joueur_id:
+        cur.execute("SELECT * FROM Amitie WHERE idJoueur1 = %s AND idJoueur2 = %s;", (flask.session["user_id"], joueur_id))
+        if cur.fetchone():
+            est_ami = True
+    
     cur.close()
     conn.close()
-    return flask.render_template("profil.html", possede=possede, partage=partage, commentaires=commentaires, joueur=joueur, taux_completion_jeux=taux_completion_jeux, infos_amis=infos_amis)
+    return flask.render_template("profil.html", possede=possede, partage=partage, commentaires=commentaires, joueur=joueur, taux_completion_jeux=taux_completion_jeux, infos_amis=infos_amis, succes_obtenus=succes_obtenus, est_ami = est_ami)
+
+@app.route("/supprimer_commentaire/<int:id_commentaire>")
+def supprimer_commentaire(id_commentaire):
+    conn = db.connect()
+    cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
+    cur.execute("DELETE FROM Commentaire WHERE idCommentaire = %s;", (id_commentaire,))
+    cur.close()
+    conn.close()
+    return flask.redirect(flask.url_for('profil', joueur_id = flask.session["user_id"]))
 
 @app.route("/reapprovisionnement", methods=["POST"])
 def reapprovisionner():
@@ -97,6 +115,27 @@ def reapprovisionner():
     conn.close()
     return flask.redirect(flask.url_for('profil', joueur_id = flask.session["user_id"]))
 
+@app.route("/commentaire/<int:id_jeu>", methods=["POST"])
+def commenter(id_jeu):
+    conn = db.connect()
+    cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
+    commentaire = flask.request.form.get("textecommentaire")
+    note = int(flask.request.form.get("note"))
+    cur.execute("SELECT * FROM Commentaire WHERE idJeu = %s AND idJoueur = %s;", (id_jeu, flask.session['user_id']))
+    if cur.fetchone():
+        cur.execute("UPDATE Commentaire SET texteCommentaire = %s, note = %s WHERE idJeu = %s AND idJoueur = %s;", (commentaire, note, id_jeu, flask.session['user_id']))
+    else:
+            cur.execute("SELECT MAX(idCommentaire) FROM Commentaire;")
+            max_id = cur.fetchone()
+            if max_id is None:
+                new_id = 1
+            else:
+                new_id = max_id.max + 1
+            cur.execute("INSERT INTO Commentaire (idCommentaire, idJeu, idJoueur, texteCommentaire, note) VALUES (%s, %s, %s, %s, %s);", (new_id ,id_jeu, flask.session['user_id'], commentaire, note))
+    cur.close()
+    conn.close()
+    return flask.redirect(flask.url_for('jeu', id=id_jeu))
+        
 @app.route("/ajout_ami/<int:id_ami>", methods=["POST"])
 def ajout_ami(id_ami):
     if 'user_id' in flask.session:
@@ -297,7 +336,7 @@ def inscription():
                 cur.execute("SELECT MAX(idJoueur) FROM Joueur;")
                 max_id = cur.fetchone()
                 if max_id is None:
-                    max_id = 0
+                    new_id = 1
                 else:
                     new_id = max_id.max + 1
                 
