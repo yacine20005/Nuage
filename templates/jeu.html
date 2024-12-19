@@ -57,6 +57,11 @@
           <br />
           {% if session.get('user_id') %}
             {% if possede %}
+             {% if partage %}
+             <form action="{{ url_for('annuler_partage', id_jeu=jeu.idjeu) }}" method="post">
+              <button type="submit" class="btn">Annuler Partage</button>
+            </form>
+            {% else %}
             <!-- Formulaire de partage avec menu déroulant -->
             <form action="{{ url_for('partage_jeu', idjeu=jeu.idjeu) }}" method ="POST">
               <!-- Checkbox cachée -->
@@ -75,6 +80,7 @@
                   {% endfor %}
                 </select>
                 <button type="submit">Partager</button>
+                {% endif %}
               </div>
             </form>
 

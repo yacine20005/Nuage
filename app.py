@@ -1,8 +1,8 @@
 from datetime import timedelta # Pour gérer la durée de la session et la date du jour
 import flask
 from passlib.context import CryptContext
-import db_yacine as db
-#import db_liam as db
+#import db_yacine as db
+import db_liam as db
 password_ctx = CryptContext(schemes=["bcrypt"]) # Création d'un objet pour gérer les mots de passe
 
 app = flask.Flask(__name__)
@@ -116,6 +116,7 @@ def ajout_ami(id_ami):
 def jeu(id):
     possede = False
     amis = None
+    partage = False
     succes_obtenu = None
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
@@ -128,6 +129,9 @@ def jeu(id):
                     WHERE commentaire.idjeu = %s;""", (id,))
     commentaires = cur.fetchall()
     
+    cur.execute("SELECT * FROM Succes WHERE idJeu= %s;", (id,))
+    succes = cur.fetchall()
+
     if "user_id" in flask.session:
         cur.execute("""SELECT J.*
             FROM JoueurJeu JJ
@@ -140,17 +144,17 @@ def jeu(id):
         cur.execute("SELECT * FROM JoueurAmis WHERE idJoueur1 = %s", (flask.session["user_id"],))
         amis = cur.fetchall()
 
-    cur.execute("SELECT * FROM Succes WHERE idJeu= %s;", (id,))
-    succes = cur.fetchall()
-    
-    if "user_id" in flask.session:
         cur.execute("SELECT * FROM JoueurSucces WHERE idJoueur = %s;", (flask.session["user_id"],))
         succes_obtenu = cur.fetchall()
         print(succes_obtenu)
-    
+
+        cur.execute("SELECT * FROM Partage where idJoueur1 = %s and idJeu = %s", (flask.session["user_id"], id))
+        partage_liste = cur.fetchone()
+        if(partage_liste):
+            partage = True
     cur.close()
     conn.close()
-    return flask.render_template("jeu.html", jeux=jeux, commentaires=commentaires, possede = possede, amis = amis, succes = succes, succes_obtenu = succes_obtenu)
+    return flask.render_template("jeu.html", jeux=jeux, commentaires=commentaires, possede = possede, amis = amis, succes = succes, succes_obtenu = succes_obtenu, partage = partage)
 
 
 @app.route("/achat_jeu/<int:idjeu>")
@@ -187,6 +191,14 @@ def achat_jeu(idjeu):
     conn.close()
     return flask.redirect(flask.url_for('profil', joueur_id=flask.session["user_id"]))
     
+@app.route("/annuler_partage/<int:id_jeu>", methods = ["POST"])
+def annuler_partage(id_jeu):
+    conn = db.connect()
+    cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
+    cur.execute("DELETE FROM Partage where idJoueur1 = %s and idJeu = %s", (flask.session["user_id"], id_jeu))
+    cur.close()
+    conn.close()
+    return flask.redirect(flask.url_for('jeu', id=id_jeu))
 
 @app.route("/partage_jeu/<int:idjeu>", methods = ["POST"])
 def partage_jeu(idjeu):
@@ -197,8 +209,7 @@ def partage_jeu(idjeu):
     cur.execute("INSERT INTO PARTAGE VALUES (%s, %s, %s);", (flask.session["user_id"], idjoueur, idjeu))
     cur.close()
     conn.close()
-    return flask.redirect(flask.url_for('profil', joueur_id=idjoueur))
-
+    return flask.redirect(flask.url_for('jeu', id=idjeu))
 
 @app.route("/deconnexion")
 def deconnexion():
