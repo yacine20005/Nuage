@@ -58,15 +58,10 @@
           {% if session.get('user_id') and joueur.idjoueur ==
           session.get('user_id') %}
           <form action="{{ url_for('reapprovisionner') }}" method="post">
-            <!-- Checkbox cachée -->
             <input type="checkbox" id="toggleInput" style="display: none" />
-
-            <!-- Label stylisé pour déclencher l'apparition -->
             <label for="toggleInput" class="btn-reappro"
               >Réapprovisionner</label
             >
-
-            <!-- Conteneur de l'input -->
             <div id="inputContainer" class="hidden">
               <label for="montant">Entrez un montant :</label>
               <input
@@ -79,8 +74,8 @@
               <button type="submit">Valider</button>
             </div>
           </form>
-          {% endif %}
-          {% if session.get('user_id') and not est_ami and joueur.idjoueur != session.get('user_id') %}
+          {% endif %} {% if session.get('user_id') and not est_ami and
+          joueur.idjoueur != session.get('user_id') %}
           <form
             action="{{ url_for('ajout_ami', id_ami=joueur.idjoueur) }}"
             method="post"
@@ -88,7 +83,6 @@
             <button type="submit">Ajouter en ami</button>
           </form>
           {% endif %}
-
         </div>
       </div>
       <div class="centered-div">
@@ -104,9 +98,9 @@
             <p>
               Taux de complétion : {% for taux in taux_completion_jeux %} {% if
               taux == jeu.idjeu %} {{ taux_completion_jeux[taux] }} {% endif %}
-              {% endfor %} 
+              {% endfor %}
             </p>
-            <a href="{{ url_for('jeu', id=jeu.idjeu) }}" class=btn>Voir</a>
+            <a href="{{ url_for('jeu', id=jeu.idjeu) }}" class="btn">Voir</a>
           </div>
           {% endfor %}
         </div>
@@ -126,12 +120,12 @@
               taux == jeu.idjeu %} {{ taux_completion_jeux[taux] }} {% endif %}
               {% endfor %} %
             </p>
-            <a href="{{ url_for('jeu', id=jeu.idjeu) }}" class=btn>Voir</a>
+            <a href="{{ url_for('jeu', id=jeu.idjeu) }}" class="btn">Voir</a>
           </div>
           {% endfor %}
         </div>
       </div>
-            <div class="centered-div">
+      <div class="centered-div">
         <h3 style="text-align: center">Mes Succès</h3>
       </div>
       <div class="centered-div_jeu">
@@ -172,7 +166,8 @@
         <div class="text-comm succes-profil">
           {% for succes in succes_obtenus %}
           <p class="text-comm-card">
-            <strong>{{ succes.intitule }}</strong> : {{ succes.description_succes }}
+            <strong>{{ succes.intitule }}</strong> : {{
+            succes.description_succes }}
             <br />
             <strong style="color: green">Obtenu</strong>
           </p>

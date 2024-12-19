@@ -1,26 +1,26 @@
 from datetime import timedelta # Pour gérer la durée de la session et la date du jour
-import flask
-from passlib.context import CryptContext
-import db_yacine as db
-#import db_liam as db
-password_ctx = CryptContext(schemes=["bcrypt"]) # Création d'un objet pour gérer les mots de passe
+import flask # Importation de la bibliothèque flask
+from passlib.context import CryptContext # Importation de la bibliothèque passlib pour gérer les mots de passe
+import db_yacine as db # Importation du module db_yacine.py pour se connecter à la base de données
+#import db_liam as db 
+password_ctx = CryptContext(schemes=["bcrypt"])
 
 app = flask.Flask(__name__)
-app.secret_key = 'super_secret'
+app.secret_key = 'super_secret' # Clé secrète pour sécuriser la session
 app.permanent_session_lifetime = timedelta(days=30)  # La session expirera après 30 jours
-@app.context_processor
+@app.context_processor 
 def inject_session():
     return dict(session=flask.session) # Permet d'accéder à la session dans les templates
 
 @app.route("/")
 def home():
-    return flask.redirect(flask.url_for('boutique'))
+    return flask.redirect(flask.url_for('boutique')) # En gros permet de rediriger vers la boutique quand aucun chemin est spécifié
 
 @app.route("/boutique", methods=["GET"])
 def boutique():
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
-    trie = flask.request.args.get('trie')
+    trie = flask.request.args.get('trie') # Récupère la valeur de l'argument 'trie' dans l'URL
     if trie == 'note':
         cur.execute('SELECT * FROM Boutique ORDER BY boutique.noteMoyenne DESC;')
     elif trie == 'date':
@@ -43,12 +43,12 @@ def profil(joueur_id):
     
     cur.execute("SELECT * FROM Joueur WHERE idJoueur = %s;", (joueur_id,))
     joueur = cur.fetchone()
-    if joueur is None:
+    if joueur is None: # Si le joueur n'existe pas, on redirige vers la boutique
         return flask.redirect(flask.url_for('boutique'))
     cur.execute("""SELECT J.*
             FROM JoueurJeu JJ
             JOIN Jeu J ON JJ.idJeu = J.idJeu
-            WHERE JJ.idJoueur = %s;""", (joueur_id,))
+            WHERE JJ.idJoueur = %s;""", (joueur_id,)) # Permet de récupérer l'ensemble des jeux possédés
     
     possede = cur.fetchall()
     
@@ -60,15 +60,15 @@ def profil(joueur_id):
     
     cur.execute("""SELECT commentaire.*, jeu.titre AS jeu_titre, jeu.idjeu AS jeu_id, joueur.pseudo
                     FROM Jeu JOIN Commentaire ON jeu.idjeu = commentaire.idjeu JOIN Joueur ON commentaire.idjoueur = joueur.idjoueur 
-                    WHERE commentaire.idjoueur = %s;""", (joueur_id,))
+                    WHERE commentaire.idjoueur = %s;""", (joueur_id,)) # Permet de récupérer l'ensemble des commentaires ainsi que les informations des jeux et des joueurs
     commentaires = cur.fetchall()
     
-    cur.execute("SELECT * FROM JoueurAmis WHERE idJoueur1 = %s", (joueur_id,))
+    cur.execute("SELECT * FROM JoueurAmis WHERE idJoueur1 = %s", (joueur_id,)) # Dans un premier temps on récupère les amis du joueur
     amis = cur.fetchall()
     infos_amis = [] # Dictionnaire pour stocker les informations des amis
     for ami in amis:
-        if ami.idjoueur1 == joueur_id:
-            cur.execute("SELECT * FROM Joueur WHERE idJoueur = %s;", (ami.idjoueur2,))
+        if ami.idjoueur1 == joueur_id: # On vérifie que le joueur est bien le joueur1 de l'amitié car la table JoueurAmis stocke le produit cartésien des amitiés
+            cur.execute("SELECT * FROM Joueur WHERE idJoueur = %s;", (ami.idjoueur2,)) # On récupère les informations
             infos_amis.append(cur.fetchone())
     
     cur.execute("SELECT Jeu.idJeu, COUNT(Succes.idSucces) AS total_succes FROM Jeu LEFT JOIN Succes ON Jeu.idJeu = Succes.idJeu GROUP BY Jeu.idJeu;")
@@ -79,25 +79,25 @@ def profil(joueur_id):
         cur.execute("SELECT COUNT(*) AS succes_debloques FROM JoueurSucces JOIN Succes ON JoueurSucces.idSucces = Succes.idSucces WHERE JoueurSucces.idJoueur = %s AND Succes.idJeu = %s", (joueur_id, jeu.idjeu))
         succes_debloques = cur.fetchone().succes_debloques
         
-        if jeu.total_succes > 0:
-            taux_completion = (succes_debloques / jeu.total_succes) * 100
+        if jeu.total_succes > 0: # On évite la division par zéro
+            taux_completion = (succes_debloques / jeu.total_succes) * 100 # Calcul du taux de complétion    
         else:
-            taux_completion = 0
+            taux_completion = 0 # Sinon c'est 0
             
         taux_completion_jeux[jeu.idjeu] = taux_completion
     
-    cur.execute("SELECT idSucces FROM JoueurSucces WHERE idJoueur = %s;", (joueur_id,))
+    cur.execute("SELECT idSucces FROM JoueurSucces WHERE idJoueur = %s;", (joueur_id,)) # On récupère les succès obtenus par le joueur
     succes_obtenus = cur.fetchall()
     infos_succes = []
     for succes in succes_obtenus:
-        cur.execute("SELECT * FROM Succes where idsucces = %s;", (succes.idsucces,))
+        cur.execute("SELECT * FROM Succes where idsucces = %s;", (succes.idsucces,)) # On récupère les informations des succès
         infos_succes.append(cur.fetchone())
     print(infos_succes)
     
     
-    if "user_id" in flask.session and flask.session["user_id"] != joueur_id:
-        cur.execute("SELECT * FROM Amitie WHERE idJoueur1 = %s AND idJoueur2 = %s;", (flask.session["user_id"], joueur_id))
-        if cur.fetchone():
+    if "user_id" in flask.session and flask.session["user_id"] != joueur_id: # On vérifie si l'utilisateur est connecté et si le profil consulté n'est pas le sien
+        cur.execute("SELECT * FROM JoueurAmis WHERE idJoueur1 = %s AND idJoueur2 = %s;", (flask.session["user_id"], joueur_id)) # On vérifie si les deux joueurs sont amis
+        if cur.fetchone(): # Si la requête retourne c'est que les deux joueurs sont amis
             est_ami = True
     
     cur.close()
@@ -119,9 +119,9 @@ def reapprovisionner():
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
 
     montant = int(flask.request.form.get("montant"))
-    if montant <= 0:
+    if montant <= 0: # On vérifie que le montant est positif
         return flask.redirect(flask.url_for('profil', joueur_id = flask.session["user_id"]))
-    cur.execute("SELECT solde FROM Joueur WHERE idjoueur = %s;", (flask.session["user_id"],))  # Utilisation de paramètres préparés pour éviter l'injection SQL car psycopg2 se charge de gérer la valeur
+    cur.execute("SELECT solde FROM Joueur WHERE idjoueur = %s;", (flask.session["user_id"],))
     solde = cur.fetchone()
     solde = solde[0]
     solde += montant
@@ -137,17 +137,17 @@ def commenter(id_jeu):
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
     commentaire = flask.request.form.get("textecommentaire")
     note = int(flask.request.form.get("note"))
-    cur.execute("SELECT * FROM Commentaire WHERE idJeu = %s AND idJoueur = %s;", (id_jeu, flask.session['user_id']))
+    cur.execute("SELECT * FROM Commentaire WHERE idJeu = %s AND idJoueur = %s;", (id_jeu, flask.session['user_id'])) # On vérifie si le joueur a déjà commenté le jeu
     if cur.fetchone():
-        cur.execute("UPDATE Commentaire SET texteCommentaire = %s, note = %s WHERE idJeu = %s AND idJoueur = %s;", (commentaire, note, id_jeu, flask.session['user_id']))
+        cur.execute("UPDATE Commentaire SET texteCommentaire = %s, note = %s WHERE idJeu = %s AND idJoueur = %s;", (commentaire, note, id_jeu, flask.session['user_id'])) # Si oui, on met à jour le commentaire
     else:
-            cur.execute("SELECT MAX(idCommentaire) FROM Commentaire;")
+            cur.execute("SELECT MAX(idCommentaire) FROM Commentaire;") # Sinon on récupère l'id maximum pour pourvoir ajouter un nouveau commentaire ensuite
             max_id = cur.fetchone()
             if max_id is None:
                 new_id = 1
             else:
                 new_id = max_id.max + 1
-            cur.execute("INSERT INTO Commentaire (idCommentaire, idJeu, idJoueur, texteCommentaire, note) VALUES (%s, %s, %s, %s, %s);", (new_id ,id_jeu, flask.session['user_id'], commentaire, note))
+            cur.execute("INSERT INTO Commentaire (idCommentaire, idJeu, idJoueur, texteCommentaire, note) VALUES (%s, %s, %s, %s, %s);", (new_id ,id_jeu, flask.session['user_id'], commentaire, note)) # Enfin on ajoute
     cur.close()
     conn.close()
     return flask.redirect(flask.url_for('jeu', id=id_jeu))
@@ -157,7 +157,7 @@ def ajout_ami(id_ami):
     if 'user_id' in flask.session:
         conn = db.connect()
         cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
-        if flask.session['user_id'] < id_ami:
+        if flask.session['user_id'] < id_ami: # Car dans la base de données on stocke les amitiés dans un sens et pas dans l'autre
             cur.execute("INSERT INTO Amitie (idJoueur1, idJoueur2) VALUES (%s, %s);", (flask.session['user_id'], id_ami))
         else:
             cur.execute("INSERT INTO Amitie (idJoueur1, idJoueur2) VALUES (%s, %s);", (id_ami, flask.session['user_id']))
@@ -177,12 +177,12 @@ def jeu(id):
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
     
-    cur.execute("SELECT * FROM Boutique WHERE idjeu = %s;", (id,))  # Utilisation de paramètres préparés pour éviter l'injection SQL car psycopg2 se charge de gérer la valeur
+    cur.execute("SELECT * FROM Boutique WHERE idjeu = %s;", (id,)) 
     jeux = cur.fetchall()
         
     cur.execute("""SELECT commentaire.*, jeu.titre AS jeu_titre, jeu.idjeu AS jeu_id, joueur.pseudo
                     FROM Jeu JOIN Commentaire ON jeu.idjeu = commentaire.idjeu JOIN Joueur ON commentaire.idjoueur = joueur.idjoueur 
-                    WHERE commentaire.idjeu = %s;""", (id,))
+                    WHERE commentaire.idjeu = %s;""", (id,)) # Permet de récupérer l'ensemble des commentaires ainsi que les informations des jeux et des joueurs
     commentaires = cur.fetchall()
     
     cur.execute("SELECT * FROM Succes WHERE idJeu= %s;", (id,))
@@ -192,11 +192,12 @@ def jeu(id):
         cur.execute("""SELECT J.*
             FROM JoueurJeu JJ
             JOIN Jeu J ON JJ.idJeu = J.idJeu
-            WHERE JJ.idJoueur = %s;""", (flask.session["user_id"],))
+            WHERE JJ.idJoueur = %s;""", (flask.session["user_id"],)) # Permet de récupérer l'ensemble des jeux possédés pa le joueur
         jeuxpossede = cur.fetchall()
         for jeu in jeuxpossede:
             if jeu.idjeu == id:
-                possede = True
+                possede = True # Le joueur a donc le jeu
+                
         cur.execute("SELECT * FROM JoueurAmis WHERE idJoueur1 = %s", (flask.session["user_id"],))
         amis = cur.fetchall()
 
@@ -204,9 +205,9 @@ def jeu(id):
         succes_obtenu = cur.fetchall()
         print(succes_obtenu)
 
-        cur.execute("SELECT * FROM Partage where idJoueur1 = %s and idJeu = %s", (flask.session["user_id"], id))
+        cur.execute("SELECT * FROM Partage where idJoueur1 = %s and idJeu = %s", (flask.session["user_id"], id)) # On regarde si le joueur partage le jeu en question
         partage_liste = cur.fetchone()
-        if(partage_liste):
+        if(partage_liste): # Si la requête retourne c'est que le joueur partage le jeu
             partage = True
 
 
@@ -217,7 +218,7 @@ def jeu(id):
         infojeu = cur.fetchone()
         cur.execute("SELECT DATE_PART('year', AGE(date_naissance)) FROM joueur WHERE idjoueur = %s;", (flask.session["user_id"],)) # La fonction DATE_PART() permet d'extraire seulement l'année tandis que la fonction AGE() permet de calculer l'âge à partir de la date de naissance
         age = int(cur.fetchone()[0])
-        if age >= infojeu.pegi and solde >= infojeu.prix:
+        if age >= infojeu.pegi and solde >= infojeu.prix: # On vérifie si le joueur a l'âge requis et si il a assez d'argent finalement 
             achat = True
 
     cur.close()
@@ -236,11 +237,11 @@ def achat_jeu(idjeu):
         cur.execute("SELECT titre, prix from jeu WHERE idjeu = %s;", (idjeu,))
         infojeu = cur.fetchone()
         solde -= infojeu.prix
-        cur.execute("UPDATE joueur SET solde = %s WHERE idjoueur = %s", (solde, flask.session["user_id"]))
+        cur.execute("UPDATE joueur SET solde = %s WHERE idjoueur = %s", (solde, flask.session["user_id"])) 
         cur.execute("INSERT INTO JoueurJeu VALUES (%s, %s)", (flask.session["user_id"], idjeu))
-        info = f"Achat du jeu {infojeu.titre}"
+        info = f"Achat du jeu {infojeu.titre}" # Permet d'ajouter l'objet de la transaction dans la table Transaction
         cur.execute("SELECT MAX(idTransaction) FROM Transaction_user;")
-        max_id = cur.fetchone()
+        max_id = cur.fetchone() # On récupère l'id maximum pour ajouter une nouvelle transaction
         if max_id is None:
             max_id = 0
         else:
@@ -300,7 +301,7 @@ def connexion():
     
     if user and password :
         etat = 1
-        if '@' in user:
+        if '@' in user: # On vérifie si monsieur a rentré un email ou un pseudo
             cur.execute("SELECT idJoueur, mot_de_passe FROM Joueur WHERE email = %s;", (user,))
         else:
             cur.execute("SELECT idJoueur, mot_de_passe FROM Joueur WHERE pseudo = %s;", (user,))
@@ -310,15 +311,15 @@ def connexion():
             etat = 2
             user_id = result.idjoueur
             user_hash = result.mot_de_passe
-            verif_mdp = password_ctx.verify(password, user_hash)
-            if verif_mdp:
+            verif_mdp = password_ctx.verify(password, user_hash) # On compare les hashs pour vérifier si le mot de passe est correct
+            if verif_mdp: # Si c'est le cas on connecte
                 etat = 3
-                flask.session.permanent = True
-                flask.session['user_id'] = user_id
+                flask.session.permanent = True # La session est permanente
+                flask.session['user_id'] = user_id # On stocke l'id du joueur dans la session
                 
     cur.close()
     conn.close()
-    if(etat != 3):
+    if(etat != 3): # Si la connexion a échoué
         return flask.render_template("connexion.html", etat = etat)
     else:
         return flask.redirect(flask.url_for('boutique'))
@@ -337,22 +338,22 @@ def inscription():
     datenaissance = flask.request.form.get('date_de_naissance')
     
     if(nom and email and user and password and datenaissance):
-        if '@' in email and  '.' in email:
+        if '@' in email and  '.' in email: # On vérifie si l'email est valide
             cur.execute("SELECT idJoueur FROM Joueur WHERE email = %s;", (email,))
             if(cur.fetchone()):
                 etat = 1
                 return flask.render_template("inscription.html", etat = etat)
             
             cur.execute("SELECT idJoueur FROM Joueur WHERE pseudo = %s;", (user,))
-            if(cur.fetchone() or len(user) < 3 or len(user) > 16):
+            if(cur.fetchone() or len(user) < 3 or len(user) > 16): # On vérifie si le pseudo est valide et s'il n'est pas déjà utilisé
                 etat = 2
                 return flask.render_template("inscription.html", etat = etat)
             
-            if(len(password) < 8):
+            if(len(password) < 8): # On vérifie si le mot de passe est assez long minimum de sécurité ici
                 etat = 3
                 return flask.render_template("inscription.html", etat = etat)
             
-            if etat == 0:
+            if etat == 0: # Tout est bon on peut insérer le joueur dans la base lesssgo
                 cur.execute("SELECT MAX(idJoueur) FROM Joueur;")
                 max_id = cur.fetchone()
                 if max_id is None:
@@ -360,7 +361,7 @@ def inscription():
                 else:
                     new_id = max_id.max + 1
                 
-                hash_pw = password_ctx.hash(password) #Calcul du hash du mot de passe à stocker
+                hash_pw = password_ctx.hash(password) # Calcul du hash du mot de passe à stocker
                 cur.execute("INSERT INTO Joueur (idJoueur, pseudo, email, mot_de_passe, nom, date_naissance, solde) VALUES (%s ,%s, %s, %s, %s, %s, 0);", (new_id ,user, email, hash_pw, nom, datenaissance))
             cur.close()
             conn.close()
