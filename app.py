@@ -34,7 +34,8 @@ def profil(joueur_id):
     
     cur.execute("SELECT * FROM Joueur WHERE idJoueur = %s;", (joueur_id,))
     joueur = cur.fetchone()
-    
+    if joueur is None:
+        return flask.redirect(flask.url_for('boutique'))
     cur.execute("""SELECT J.*
             FROM JoueurJeu JJ
             JOIN Jeu J ON JJ.idJeu = J.idJeu
@@ -76,8 +77,14 @@ def profil(joueur_id):
             
         taux_completion_jeux[jeu.idjeu] = taux_completion
     
-    cur.execute("SELECT * FROM JoueurSucces WHERE idJoueur = %s;", (joueur_id,))
+    cur.execute("SELECT idSucces FROM JoueurSucces WHERE idJoueur = %s;", (joueur_id,))
     succes_obtenus = cur.fetchall()
+    infos_succes = []
+    for succes in succes_obtenus:
+        cur.execute("SELECT * FROM Succes where idsucces = %s;", (succes.idsucces,))
+        infos_succes.append(cur.fetchone())
+    print(infos_succes)
+    
     
     if "user_id" in flask.session and flask.session["user_id"] != joueur_id:
         cur.execute("SELECT * FROM Amitie WHERE idJoueur1 = %s AND idJoueur2 = %s;", (flask.session["user_id"], joueur_id))
@@ -86,7 +93,7 @@ def profil(joueur_id):
     
     cur.close()
     conn.close()
-    return flask.render_template("profil.html", possede=possede, partage=partage, commentaires=commentaires, joueur=joueur, taux_completion_jeux=taux_completion_jeux, infos_amis=infos_amis, succes_obtenus=succes_obtenus, est_ami = est_ami)
+    return flask.render_template("profil.html", possede=possede, partage=partage, commentaires=commentaires, joueur=joueur, taux_completion_jeux=taux_completion_jeux, infos_amis=infos_amis, succes_obtenus=infos_succes, est_ami = est_ami)
 
 @app.route("/supprimer_commentaire/<int:id_commentaire>")
 def supprimer_commentaire(id_commentaire):

@@ -88,16 +88,19 @@
           {% endif %} {% endif %}
         </div>
       </div>
+      <div class="centered-div">
+        <h3 style="text-align: center">Description</h3>
+      </div>
       <div class="centered-div_jeu">
-        <h2>Description</h2>
         <div class="text-descr">
           <p>{{ jeu.description }}</p>
         </div>
       </div>
       {% endfor %}
-
+      <div class="centered-div">
+        <h3 style="text-align: center">Succès</h3>
+      </div>
       <div class="centered-div_jeu">
-        <h2>Succès</h2>
         <div class="text-comm">
           {% for succes in succes %}
           <p class="text-comm-card">
@@ -115,8 +118,10 @@
 
       {% if session.get('user_id') %} {% if possede %}
       {% for jeu in jeux %}
+      <div class="centered-div">
+        <h3 style="text-align: center">Commenter</h3>
+      </div>
       <div class="centered-div_jeu">
-        <h2>Commenter</h2>
         <div class="text-comm">
           <form action="{{ url_for('commenter', id_jeu=jeu.idjeu) }}" method="POST">
             <div>
@@ -138,9 +143,10 @@
       </div>
       {% endfor %}
       {% endif %} {% endif %}
-
+      <div class="centered-div">
+        <h3 style="text-align: center">Commentaire</h3>
+      </div>
       <div class="centered-div_jeu">
-        <h2>Commentaires</h2>
         <div class="text-comm">
           {% for commentaire in commentaires %}
           <p class="text-comm-card">

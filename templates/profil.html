@@ -80,7 +80,7 @@
             </div>
           </form>
           {% endif %}
-          {% if session.get('user_id') and not est_ami %}
+          {% if session.get('user_id') and not est_ami and joueur.idjoueur != session.get('user_id') %}
           <form
             action="{{ url_for('ajout_ami', id_ami=joueur.idjoueur) }}"
             method="post"
@@ -129,8 +129,10 @@
           {% endfor %}
         </div>
       </div>
+            <div class="centered-div">
+        <h3 style="text-align: center">Mes Succès</h3>
+      </div>
       <div class="centered-div_jeu">
-        <h3 style="text-align: center">Mes Commentaires</h3>
         <div class="text-comm">
           {% for commentaire in commentaires %}
           <p class="text-comm-card">
@@ -139,6 +141,7 @@
             <strong>{{ commentaire.jeu_titre }}</strong> : {{
             commentaire.textecommentaire }} {% if session.get('user_id') and
             commentaire.idjoueur == session.get('user_id') %}
+            <br />
             <br />
             <a
               href="{{ url_for('supprimer_commentaire', id_commentaire=commentaire.idcommentaire) }}"
@@ -161,17 +164,17 @@
         </div>
       </div>
       <div class="centered-div">
-        <h3 style="text-align: center">Mes succès</h3>
-        <div class="text-comm">
-          {% for succes in succes %}
+        <h3 style="text-align: center">Mes Succès</h3>
+      </div>
+      <div class="centered-div_jeu">
+        <div class="text-comm succes-profil">
+          {% for succes in succes_obtenus %}
           <p class="text-comm-card">
-            <strong> {{ succes.intitule }} </strong> : {{
-            succes.description_succes }}
+            <strong>{{ succes.intitule }}</strong> : {{ succes.description_succes }}
             <br />
             <strong style="color: green">Obtenu</strong>
           </p>
-            {% endfor %}
-          </p>
+          {% endfor %}
         </div>
       </div>
     </main>
