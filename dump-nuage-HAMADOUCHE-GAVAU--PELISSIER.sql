@@ -185,7 +185,9 @@ CREATE VIEW Boutique AS
         j.description_Jeu AS description,
         j.image_path,
         STRING_AGG(DISTINCT g.nomGenre, ', ') AS genres,
-        ROUND(AVG(c.note), 0) AS noteMoyenne
+        ROUND(AVG(c.note), 0) AS noteMoyenne,
+        COUNT(DISTINCT t.idTransaction) AS NombreVentes
+
     FROM 
         Jeu AS j
         LEFT JOIN JeuGenre AS jg ON j.idJeu = jg.idJeu
@@ -193,6 +195,7 @@ CREATE VIEW Boutique AS
         LEFT JOIN Entreprise AS d ON j.idDeveloppeur = d.idEntreprise
         LEFT JOIN Entreprise AS ed ON j.idEditeur = ed.idEntreprise
         LEFT JOIN Commentaire AS c ON j.idJeu = c.idJeu
+        LEFT JOIN Transaction_user AS t ON j.idJeu = t.idJeu
     GROUP BY 
         j.idJeu, j.titre, j.prix, j.date_de_sortie, j.pegi, j.idDeveloppeur, j.idEditeur, j.description_Jeu, j.image_path, d.nomEntreprise, ed.nomEntreprise
 );

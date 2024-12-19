@@ -81,10 +81,10 @@
             </div>
           </form>
 
-          {% else %}
-          <a href="{{ url_for('achat_jeu', idjeu=jeu.idjeu) }}" class="btn"
-            >Acheter</a
-          >
+          {% else %} 
+          {% if achat %}
+          <a href="{{ url_for('achat_jeu', idjeu=jeu.idjeu) }}" class="btn">Acheter</a>
+          {% endif %}
           {% endif %} {% endif %}
         </div>
       </div>

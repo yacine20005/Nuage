@@ -104,8 +104,9 @@
             <p>
               Taux de complétion : {% for taux in taux_completion_jeux %} {% if
               taux == jeu.idjeu %} {{ taux_completion_jeux[taux] }} {% endif %}
-              {% endfor %} %
+              {% endfor %} 
             </p>
+            <a href="{{ url_for('jeu', id=jeu.idjeu) }}" class=btn>Voir</a>
           </div>
           {% endfor %}
         </div>
@@ -125,6 +126,7 @@
               taux == jeu.idjeu %} {{ taux_completion_jeux[taux] }} {% endif %}
               {% endfor %} %
             </p>
+            <a href="{{ url_for('jeu', id=jeu.idjeu) }}" class=btn>Voir</a>
           </div>
           {% endfor %}
         </div>

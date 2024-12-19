@@ -16,11 +16,19 @@ def inject_session():
 def home():
     return flask.redirect(flask.url_for('boutique'))
 
-@app.route("/boutique")
+@app.route("/boutique", methods=["GET"])
 def boutique():
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
-    cur.execute('SELECT * FROM Boutique;')
+    trie = flask.request.args.get('trie')
+    if trie == 'note':
+        cur.execute('SELECT * FROM Boutique ORDER BY boutique.noteMoyenne DESC;')
+    elif trie == 'date':
+        cur.execute('SELECT * FROM Boutique ORDER BY boutique.date_de_sortie DESC;')
+    elif trie == 'nb_ventes':
+        cur.execute('SELECT * FROM Boutique ORDER BY boutique.NombreVentes DESC;')
+    else:
+        cur.execute('SELECT * FROM Boutique ORDER BY titre;')
     jeux = cur.fetchall()
     cur.close()
     conn.close()
@@ -29,6 +37,7 @@ def boutique():
 @app.route("/profil/<int:joueur_id>")
 def profil(joueur_id):
     est_ami = False
+
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
     
@@ -164,6 +173,7 @@ def jeu(id):
     amis = None
     partage = False
     succes_obtenu = None
+    achat = False
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
     
@@ -198,9 +208,21 @@ def jeu(id):
         partage_liste = cur.fetchone()
         if(partage_liste):
             partage = True
+
+
+        cur.execute("SELECT solde FROM Joueur WHERE idjoueur = %s;", (flask.session["user_id"],))
+        solde = cur.fetchone()
+        solde = solde[0]
+        cur.execute("SELECT titre, prix, pegi from jeu WHERE idjeu = %s;", (id,))
+        infojeu = cur.fetchone()
+        cur.execute("SELECT DATE_PART('year', AGE(date_naissance)) FROM joueur WHERE idjoueur = %s;", (flask.session["user_id"],)) # La fonction DATE_PART() permet d'extraire seulement l'année tandis que la fonction AGE() permet de calculer l'âge à partir de la date de naissance
+        age = int(cur.fetchone()[0])
+        if age >= infojeu.pegi and solde >= infojeu.prix:
+            achat = True
+
     cur.close()
     conn.close()
-    return flask.render_template("jeu.html", jeux=jeux, commentaires=commentaires, possede = possede, amis = amis, succes = succes, succes_obtenu = succes_obtenu, partage = partage)
+    return flask.render_template("jeu.html", jeux=jeux, commentaires=commentaires, possede = possede, amis = amis, succes = succes, succes_obtenu = succes_obtenu, partage = partage, achat = achat)
 
 
 @app.route("/achat_jeu/<int:idjeu>")
@@ -208,31 +230,22 @@ def achat_jeu(idjeu):
     if "user_id" in flask.session:
         conn = db.connect()
         cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
-
         cur.execute("SELECT solde FROM Joueur WHERE idjoueur = %s;", (flask.session["user_id"],))
         solde = cur.fetchone()
         solde = solde[0]
-        cur.execute("SELECT titre, prix, pegi from jeu WHERE idjeu = %s;", (idjeu,))
+        cur.execute("SELECT titre, prix from jeu WHERE idjeu = %s;", (idjeu,))
         infojeu = cur.fetchone()
-        cur.execute("SELECT DATE_PART('year', AGE(date_naissance)) FROM joueur WHERE idjoueur = %s;", (flask.session["user_id"],)) # La fonction DATE_PART() permet d'extraire seulement l'année tandis que la fonction AGE() permet de calculer l'âge à partir de la date de naissance
-        age = int(cur.fetchone()[0])
-        if age < infojeu.pegi:
-            return "Vous n'avez pas l'âge requis pour acheter ce jeu"
-        if solde < infojeu.prix:
-            return "Solde insufissant a l'achat"
+        solde -= infojeu.prix
+        cur.execute("UPDATE joueur SET solde = %s WHERE idjoueur = %s", (solde, flask.session["user_id"]))
+        cur.execute("INSERT INTO JoueurJeu VALUES (%s, %s)", (flask.session["user_id"], idjeu))
+        info = f"Achat du jeu {infojeu.titre}"
+        cur.execute("SELECT MAX(idTransaction) FROM Transaction_user;")
+        max_id = cur.fetchone()
+        if max_id is None:
+            max_id = 0
         else:
-            solde -= infojeu.prix
-            cur.execute("UPDATE joueur SET solde = %s WHERE idjoueur = %s", (solde, flask.session["user_id"]))
-            cur.execute("INSERT INTO JoueurJeu VALUES (%s, %s)", (flask.session["user_id"], idjeu))
-            info = f"Achat du jeu {infojeu.titre}"
-            print(info)
-            cur.execute("SELECT MAX(idTransaction) FROM Transaction_user;")
-            max_id = cur.fetchone()
-            if max_id is None:
-                max_id = 0
-            else:
-                new_id = max_id.max + 1
-            cur.execute("INSERT INTO Transaction_user (idTransaction, idJoueur, idJeu, montant, objet_transaction) VALUES (%s, %s, %s, %s, %s);", (new_id, flask.session["user_id"], idjeu, infojeu.prix, info,))
+            new_id = max_id.max + 1
+        cur.execute("INSERT INTO Transaction_user (idTransaction, idJoueur, idJeu, montant, objet_transaction) VALUES (%s, %s, %s, %s, %s);", (new_id, flask.session["user_id"], idjeu, infojeu.prix, info,))
     cur.close()
     conn.close()
     return flask.redirect(flask.url_for('profil', joueur_id=flask.session["user_id"]))
