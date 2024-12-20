@@ -82,6 +82,12 @@
           >
             <button type="submit">Ajouter en ami</button>
           </form>
+          {% endif %} {% if session.get('user_id') and est_ami and joueur.idjoueur != session.get('user_id') %}
+          <form
+            action="{{ url_for('supprimer_ami', id_ami=joueur.idjoueur) }}"
+            method="post"
+          >
+            <button type="submit">Supprimer de mes amis</button>
           {% endif %}
         </div>
       </div>
@@ -126,7 +132,7 @@
         </div>
       </div>
       <div class="centered-div">
-        <h3 style="text-align: center">Mes Succès</h3>
+        <h3 style="text-align: center">Mes Commentaires</h3>
       </div>
       <div class="centered-div_jeu">
         <div class="text-comm">

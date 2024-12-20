@@ -166,6 +166,21 @@ def ajout_ami(id_ami):
         return flask.redirect(flask.url_for('profil', joueur_id=id_ami))
     else:
         return flask.redirect(flask.url_for('connexion'))
+    
+@app.route("/supprimer_ami/<int:id_ami>", methods=["POST"])
+def supprimer_ami(id_ami):
+    if 'user_id' in flask.session:
+        conn = db.connect()
+        cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
+        if flask.session['user_id'] < id_ami:
+            cur.execute("DELETE FROM Amitie WHERE idJoueur1 = %s AND idJoueur2 = %s;", (flask.session['user_id'], id_ami))
+        else:
+            cur.execute("DELETE FROM Amitie WHERE idJoueur1 = %s AND idJoueur2 = %s;", (id_ami, flask.session['user_id']))
+        cur.close()
+        conn.close()
+        return flask.redirect(flask.url_for('profil', joueur_id= id_ami))
+    else:
+        return flask.redirect(flask.url_for('connexion'))
 
 @app.route("/jeu/<int:id>")
 def jeu(id):
