@@ -184,7 +184,7 @@ CREATE VIEW Boutique AS
         ed.nomEntreprise AS editeur,
         j.description_Jeu AS description,
         j.image_path,
-        STRING_AGG(DISTINCT g.nomGenre, ', ') AS genres,
+        STRING_AGG(DISTINCT g.nomGenre, ', ') AS genres, --STRING_AGG permet de concaténer les genres en une seule chaîne de caractères--
         ROUND(AVG(c.note), 0) AS noteMoyenne,
         COUNT(DISTINCT t.idTransaction) AS NombreVentes
 
