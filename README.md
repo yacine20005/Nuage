@@ -1,8 +1,8 @@
-# Projet-Nuage
+# Nuage
 
 ## Introduction
 
-Projet-Nuage est une application web de gestion de jeux vidéo. Elle permet aux utilisateurs de consulter, acheter, partager et commenter des jeux vidéo. Les utilisateurs peuvent également gérer leur profil, ajouter des amis et suivre leurs succès dans les jeux.
+Nuage est une application web de gestion de jeux vidéo. Elle permet aux utilisateurs de consulter, acheter, partager et commenter des jeux vidéo. Les utilisateurs peuvent également gérer leur profil, ajouter des amis et suivre leurs succès dans les jeux.
 
 ## Installation
 
@@ -10,7 +10,7 @@ Pour installer et exécuter le projet localement, suivez les étapes ci-dessous 
 
 1. Clonez le dépôt GitHub :
    ```bash
-   git clone https://github.com/yacine20005/Projet-Nuage.git
+   git clone https://github.com/yacine20005/Nuage.git
    cd Projet-Nuage
    ```
 
