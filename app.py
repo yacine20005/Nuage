@@ -1,7 +1,7 @@
 from datetime import timedelta # Pour gérer la durée de la session et la date du jour
 import flask # Importation de la bibliothèque flask
 from passlib.context import CryptContext # Importation de la bibliothèque passlib pour gérer les mots de passe
-import db_yacine as db # Importation du module db_yacine.py pour se connecter à la base de données
+import db_pa as db # Importation du module db_yacine.py pour se connecter à la base de données
 #import db_liam as db 
 password_ctx = CryptContext(schemes=["bcrypt"])
 
