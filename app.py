@@ -12,7 +12,6 @@ import db_pa as db  # Importation du module db_yacine.py pour se connecter à la
 password_ctx = CryptContext(schemes=["bcrypt"])
 
 app = flask.Flask(__name__)
-logging.basicConfig(filename='ips.log', level=logging.INFO, format='%(asctime)s - %(message)s')
 app.secret_key = 'super_secret' # Clé secrète pour sécuriser la session
 app.permanent_session_lifetime = timedelta(days=30)  # La session expirera après 30 jours
 @app.context_processor 
@@ -392,12 +391,6 @@ def inscription():
             return flask.redirect(flask.url_for('connexion'))
         
     return flask.render_template("inscription.html", etat = etat)
-
-@app.route("/image.jpg")
-def image():
-    client_ip = flask.request.remote_addr
-    logging.info("Image requested from IP: %s", client_ip)
-    return flask.send_file("static/images/cyberpunk2077.jpg", mime="image/jpeg")
 
 if __name__ == '__main__':
     app.run(debug=True)
