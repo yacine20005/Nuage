@@ -1,6 +1,6 @@
-Flask==2.0.3
-Werkzeug==2.0.3
-passlib==1.7.4
-psycopg2-binary==2.9.3
+Flask
+Werkzeug
+passlib
+psycopg2-binary
 gunicorn
 python-dotenv
