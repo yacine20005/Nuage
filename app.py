@@ -1,4 +1,3 @@
-import logging
 from datetime import \
     timedelta  # Pour gérer la durée de la session et la date du jour
 
@@ -6,7 +5,7 @@ import flask  # Importation de la bibliothèque flask
 from passlib.context import \
     CryptContext  # Importation de la bibliothèque passlib pour gérer les mots de passe
 
-import db_pa as db  # Importation du module db_yacine.py pour se connecter à la base de données
+import db_pa as db
 
 #import db_liam as db 
 password_ctx = CryptContext(schemes=["bcrypt"])
@@ -97,9 +96,7 @@ def profil(joueur_id):
     infos_succes = []
     for succes in succes_obtenus:
         cur.execute("SELECT * FROM Succes where idsucces = %s;", (succes.idsucces,)) # On récupère les informations des succès
-        infos_succes.append(cur.fetchone())
-    print(infos_succes)
-    
+        infos_succes.append(cur.fetchone())    
     
     if "user_id" in flask.session and flask.session["user_id"] != joueur_id: # On vérifie si l'utilisateur est connecté et si le profil consulté n'est pas le sien
         cur.execute("SELECT * FROM JoueurAmis WHERE idJoueur1 = %s AND idJoueur2 = %s;", (flask.session["user_id"], joueur_id)) # On vérifie si les deux joueurs sont amis
@@ -193,7 +190,7 @@ def jeu(id):
     possede = False
     amis = None
     partage = False
-    succes_obtenu = None
+    succes_obtenu = []
     achat = False
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
@@ -217,14 +214,13 @@ def jeu(id):
         jeuxpossede = cur.fetchall()
         for jeu in jeuxpossede:
             if jeu.idjeu == id:
-                possede = True # Le joueur a donc le jeu
+                possede = True
                 
         cur.execute("SELECT * FROM JoueurAmis WHERE idJoueur1 = %s", (flask.session["user_id"],))
         amis = cur.fetchall()
 
         cur.execute("SELECT * FROM JoueurSucces WHERE idJoueur = %s;", (flask.session["user_id"],))
-        succes_obtenu = cur.fetchall()
-        print(succes_obtenu)
+        succes_obtenu = cur.fetchall() or []
 
         cur.execute("SELECT * FROM Partage where idJoueur1 = %s and idJeu = %s", (flask.session["user_id"], id)) # On regarde si le joueur partage le jeu en question
         partage_liste = cur.fetchone()
@@ -286,7 +282,6 @@ def partage_jeu(idjeu):
     conn = db.connect()
     cur = conn.cursor(cursor_factory=db.psycopg2.extras.NamedTupleCursor)
     idjoueur = flask.request.form.get('ami')
-    print(idjoueur)
     cur.execute("INSERT INTO PARTAGE VALUES (%s, %s, %s);", (flask.session["user_id"], idjoueur, idjeu))
     cur.close()
     conn.close()
