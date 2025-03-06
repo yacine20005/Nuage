@@ -41,20 +41,38 @@
       </nav>
     </header>
     <main>
-      <div class="centered-div">
+      <section class="profile-header">
         {% if session.get('user_id') and joueur.idjoueur ==
-        session.get('user_id')%}
-        <h1 style="text-align: center">Votre Profil</h1>
+        session.get('user_id') %}
+        <h1>Votre Profil</h1>
         {% else %}
-        <h1 style="text-align: center">Profil de {{ joueur.pseudo }}</h1>
+        <h1>Profil de {{ joueur.pseudo }}</h1>
         {% endif %}
-        <div class="game-card">
-          <strong>ID joueur</strong> : {{ joueur.idjoueur }}<br />
-          <strong>Pseudo</strong> : {{ joueur.pseudo }}<br />
-          <strong>Email</strong> : {{ joueur.email }}<br />
-          <strong>Date de naissance</strong> : {{ joueur.date_naissance }}<br />
-          <strong>Solde</strong> : {{ joueur.solde }}€<br />
 
+        <div class="profile-info">
+          <div class="profile-info-item">
+            <strong>ID joueur</strong>
+            <span>{{ joueur.idjoueur }}</span>
+          </div>
+          <div class="profile-info-item">
+            <strong>Pseudo</strong>
+            <span>{{ joueur.pseudo }}</span>
+          </div>
+          <div class="profile-info-item">
+            <strong>Email</strong>
+            <span>{{ joueur.email }}</span>
+          </div>
+          <div class="profile-info-item">
+            <strong>Date de naissance</strong>
+            <span>{{ joueur.date_naissance }}</span>
+          </div>
+          <div class="profile-info-item">
+            <strong>Solde</strong>
+            <span>{{ joueur.solde }}€</span>
+          </div>
+        </div>
+
+        <div class="profile-actions">
           {% if session.get('user_id') and joueur.idjoueur ==
           session.get('user_id') %}
           <form action="{{ url_for('reapprovisionner') }}" method="post">
@@ -71,7 +89,7 @@
                 placeholder="Ex : 100"
                 required
               />
-              <button type="submit">Valider</button>
+              <button type="submit" class="btn">Valider</button>
             </div>
           </form>
           {% endif %} {% if session.get('user_id') and not est_ami and
@@ -80,19 +98,22 @@
             action="{{ url_for('ajout_ami', id_ami=joueur.idjoueur) }}"
             method="post"
           >
-            <button type="submit">Ajouter en ami</button>
+            <button type="submit" class="btn">Ajouter en ami</button>
           </form>
-          {% endif %} {% if session.get('user_id') and est_ami and joueur.idjoueur != session.get('user_id') %}
+          {% endif %} {% if session.get('user_id') and est_ami and
+          joueur.idjoueur != session.get('user_id') %}
           <form
             action="{{ url_for('supprimer_ami', id_ami=joueur.idjoueur) }}"
             method="post"
           >
-            <button type="submit">Supprimer de mes amis</button>
+            <button type="submit" class="btn">Supprimer de mes amis</button>
+          </form>
           {% endif %}
         </div>
-      </div>
-      <div class="centered-div">
-        <h3 style="text-align: center">Mes jeux possédés</h3>
+      </section>
+
+      <section class="game-section">
+        <h2>Mes jeux possédés</h2>
         <div class="game-list">
           {% for jeu in possede %}
           <div class="game-card">
@@ -110,9 +131,10 @@
           </div>
           {% endfor %}
         </div>
-      </div>
-      <div class="centered-div">
-        <h3 style="text-align: center">Mes jeux prêtés</h3>
+      </section>
+
+      <section class="game-section">
+        <h2>Mes jeux prêtés</h2>
         <div class="game-list">
           {% for jeu in partage %}
           <div class="game-card">
@@ -124,62 +146,58 @@
             <p>
               Taux de complétion : {% for taux in taux_completion_jeux %} {% if
               taux == jeu.idjeu %} {{ taux_completion_jeux[taux] }} {% endif %}
-              {% endfor %} %
+              {% endfor %}
             </p>
             <a href="{{ url_for('jeu', id=jeu.idjeu) }}" class="btn">Voir</a>
           </div>
           {% endfor %}
         </div>
-      </div>
-      <div class="centered-div">
-        <h3 style="text-align: center">Mes Commentaires</h3>
-      </div>
-      <div class="centered-div_jeu">
+      </section>
+
+      <section class="comments-section">
+        <h2>Mes Commentaires</h2>
         <div class="text-comm">
           {% for commentaire in commentaires %}
-          <p class="text-comm-card">
-            <strong class="align-right">{{ commentaire.note }}/20</strong>
-            <br />
-            <strong>{{ commentaire.jeu_titre }}</strong> : {{
-            commentaire.textecommentaire }} {% if session.get('user_id') and
-            commentaire.idjoueur == session.get('user_id') %}
-            <br />
-            <br />
+          <div class="text-comm-card">
+            <span class="align-right">{{ commentaire.note }}/20</span>
+            <strong>{{ commentaire.jeu_titre }}</strong>
+            <p>{{ commentaire.textecommentaire }}</p>
+            {% if session.get('user_id') and commentaire.idjoueur ==
+            session.get('user_id') %}
             <a
               href="{{ url_for('supprimer_commentaire', id_commentaire=commentaire.idcommentaire) }}"
               class="btn"
               >Supprimer</a
             >
             {% endif %}
-          </p>
+          </div>
           {% endfor %}
         </div>
-      </div>
-      <div class="centered-div">
-        <h3 style="text-align: center">Mes amis</h3>
-        <div class="game-list">
+      </section>
+
+      <section class="friends-section">
+        <h2>Mes amis</h2>
+        <div class="friends-list">
           {% for info_ami in infos_amis %}
-          <div class="game-card">
+          <div class="friend-card">
             <h3>{{ info_ami.pseudo }}</h3>
           </div>
           {% endfor %}
         </div>
-      </div>
-      <div class="centered-div">
-        <h3 style="text-align: center">Mes Succès</h3>
-      </div>
-      <div class="centered-div_jeu">
-        <div class="text-comm succes-profil">
+      </section>
+
+      <section class="achievements-section">
+        <h2>Mes Succès</h2>
+        <div class="succes-profil">
           {% for succes in succes_obtenus %}
-          <p class="text-comm-card">
-            <strong>{{ succes.intitule }}</strong> : {{
-            succes.description_succes }}
-            <br />
-            <strong style="color: green">Obtenu</strong>
-          </p>
+          <div class="achievement-card">
+            <strong>{{ succes.intitule }}</strong>
+            <p>{{ succes.description_succes }}</p>
+            <span style="color: green">Obtenu</span>
+          </div>
           {% endfor %}
         </div>
-      </div>
+      </section>
     </main>
 
     <footer>

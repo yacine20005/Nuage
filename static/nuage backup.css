@@ -1,0 +1,295 @@
+:root {
+  --primary-color: #1c1c1c;
+  --background-color: #121212;
+  --text-color: #ffffff;
+  --secondary-color: #1c1c1c;
+  --accent-color: #950101;
+  --hover-color: #3d0000;
+}
+
+body {
+  font-family: Questrial, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  margin: 0;
+  padding: 0;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+header {
+  background-color: var(--primary-color);
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav ul {
+  list-style-type: none;
+  display: flex;
+}
+
+nav ul li {
+  margin-left: 1rem;
+}
+
+nav ul li a {
+  color: var(--text-color);
+  text-decoration: none;
+}
+
+main {
+  padding: 2rem;
+  padding-bottom: 100px;
+}
+
+form {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+input {
+  width: 400px;
+  padding: 10px;
+  background-color: var(--primary-color);
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+  font-size: 16px;
+  color: white;
+}
+
+select {
+  padding: 10px;
+  background-color: var(--primary-color);
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+  border-left: none;
+  font-size: 16px;
+  color: white;
+}
+
+button[type="submit"] {
+  padding: 10px 20px;
+  border: 2px solid #ccc;
+  border-radius: 4px 4px 4px 4px;
+  background-color: var(--accent-color);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background-color: var(--hover-color);
+}
+
+footer {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  text-align: center;
+  padding: 1rem;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+.logo {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.game-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  justify-content: center;
+}
+
+.game-card {
+  background-color: var(--secondary-color);
+  border-radius: 5px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.game-card img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+
+.game-card h3 {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+}
+
+.game-card p {
+  display: flex;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+.btn {
+  display: inline-block;
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  padding: 0.5rem 1rem;
+  border-radius: 3px;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.btn:hover {
+  background-color: var(--hover-color);
+}
+
+.recherche button[type="submit"] {
+  padding: 10px 20px;
+  border: 2px solid #ccc;
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+  background-color: var(--accent-color);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.centered-div {
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 3rem;
+  /*display: flex; 
+  align-items: flex-start; */
+}
+
+.centered-div_jeu {
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 3rem;
+  display: flex;
+  align-items: flex-start;
+}
+
+
+.centered-image {
+  display: block;
+  width: 70%;
+  margin-top: 1rem;
+  height: auto;
+}
+
+.title-game {
+  display: block;
+  width: 70%;
+  margin-top: 0rem;
+  height: auto;
+}
+
+.text-content {
+  text-align: left;
+  margin-left: 2rem; /* Ajoute un espace entre l'image et le texte */
+}
+
+.text-descr {
+  margin-left: -7.77rem;
+  margin-top: 3rem;
+  padding: auto;
+}
+
+.text-comm {
+  margin-left: 0;
+  margin-top: 3rem;
+  padding: auto;
+}
+
+.text-comm-card {
+  background-color: var(--secondary-color);
+  border-radius: 5px;
+  padding: 1rem;
+}
+
+
+.inscription {
+  display: flex;
+  justify-content: center;
+  margin: 15px 0;
+}
+
+form .inscription input {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--secondary-color);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  color: white;
+  margin-bottom: 10px;
+}
+
+/* Cache le conteneur de l'input par défaut */
+.hidden {
+  display: none;
+  margin-top: 10px;
+}
+
+/* Affiche le conteneur si la checkbox est cochée */
+#toggleInput:checked + label + #inputContainer {
+  display: block;
+}
+
+/* Bouton Réapprovisionner (adapté au design global) */
+.btn-reappro {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+.btn-reappro:hover {
+  background-color: var(--hover-color);
+}
+
+/* Conteneur d'input pour la saisie du montant */
+#inputContainer {
+  margin-top: 10px;
+  text-align: center;
+}
+
+#inputContainer input {
+  padding: 10px;
+  width: 200px;
+  background-color: var(--primary-color);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  color: var(--text-color);
+}
+
+#inputContainer input::placeholder {
+  color: #ccc;
+}
+
+#inputContainer button {
+  padding: 10px 15px;
+  margin-left: 10px;
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#inputContainer button:hover {
+  background-color: var(--hover-color);
+}
